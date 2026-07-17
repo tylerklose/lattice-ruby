@@ -32,8 +32,10 @@ not change observable behavior or marks a divergence the goldens cannot see.
 
 ## Accepted survivor categories
 
-The final full run scores ~96%. The residue is dominated by mutants we accept
-deliberately rather than distort the code or tests to kill:
+The final full run scores 98.0% (163 alive of 8,120 mutations, spread over 26
+of 86 subjects; 1,756 further mutants died by timeout — infinite-loop
+mutations). The residue is dominated by mutants we accept deliberately rather
+than distort the code or tests to kill:
 
 - **Redundant bit-masking in the RNG.** `MersenneTwister` mirrors CPython's
   MT19937, including masks that are provably no-ops on already-32-bit values
@@ -53,6 +55,13 @@ deliberately rather than distort the code or tests to kill:
 - **Unreachable-state guards.** Branches that defend states earlier
   validation makes impossible (e.g. a forced constraint with zero parsed
   assignments raises during parsing, so the engine-side guard can't fire).
+
+- **Interpreter-crash false alives.** At least one survivor (`while nil &&
+  ...` in `IPOG#generate_covering_array`) is trivially fatal but triggers a
+  CRuby 3.4.7 (+PRISM) `[BUG] Stack consistency error` — the forked kill
+  process dies before the failing assertion can register, so mutant cannot
+  record the kill. Verified by applying the mutation by hand: the golden
+  suite crashes the VM immediately.
 
 When a survivor exposed genuinely redundant code rather than a missing test,
 the code was simplified instead: `normalize_scalar`'s explicit `true`/`false`

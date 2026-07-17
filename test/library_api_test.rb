@@ -114,6 +114,13 @@ class LibraryApiTest < Minitest::Test
     assert_equal ["Model has no valid complete assignments."], error.errors
   end
 
+  def test_generate_forwards_progress_callback
+    events = []
+    Lattice.generate(file: fixture_path("simple.json"), progress: ->(p) { events << p.event })
+    assert_includes events, "enumerated"
+    assert_includes events, "scenario"
+  end
+
   def test_scenarios_are_deeply_frozen
     run = Lattice.generate(file: fixture_path("simple.json"))
     assert_predicate run.scenarios, :frozen?
