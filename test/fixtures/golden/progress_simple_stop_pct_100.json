@@ -1,0 +1,50 @@
+[
+  {
+    "event": "enumerating",
+    "scenario": 0,
+    "covered": 12,
+    "total": 12,
+    "cumulative_pct": 100.0,
+    "uncovered": 0
+  },
+  {
+    "event": "enumerated",
+    "scenario": 0,
+    "covered": 0,
+    "total": 12,
+    "cumulative_pct": 0.0,
+    "uncovered": 12
+  },
+  {
+    "event": "scenario",
+    "scenario": 1,
+    "covered": 3,
+    "total": 12,
+    "cumulative_pct": 25.0,
+    "uncovered": 9
+  },
+  {
+    "event": "scenario",
+    "scenario": 2,
+    "covered": 6,
+    "total": 12,
+    "cumulative_pct": 50.0,
+    "uncovered": 6
+  },
+  {
+    "event": "scenario",
+    "scenario": 3,
+    "covered": 9,
+    "total": 12,
+    "cumulative_pct": 75.0,
+    "uncovered": 3
+  },
+  {
+    "event": "scenario",
+    "scenario": 4,
+    "covered": 12,
+    "total": 12,
+    "cumulative_pct": 100.0,
+    "uncovered": 0
+  }
+]

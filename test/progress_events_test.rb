@@ -15,7 +15,8 @@ class ProgressEventsTest < Minitest::Test
   CONFIGS = {
     "simple_default" => ["simple.json", {}],
     "constrained_max_rows" => ["constrained.json", { max_rows: 3 }],
-    "skillit_s3_stop_pct" => ["skillit.json", { strength: 3, stop_after_coverage: 75.0, pool_size: 5 }]
+    "skillit_s3_stop_pct" => ["skillit.json", { strength: 3, stop_after_coverage: 75.0, pool_size: 5 }],
+    "simple_stop_pct_100" => ["simple.json", { stop_after_coverage: 100.0 }]
   }.freeze
 
   CONFIGS.each do |name, (fixture, kwargs)|

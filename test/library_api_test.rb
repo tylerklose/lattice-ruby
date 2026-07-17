@@ -102,6 +102,24 @@ class LibraryApiTest < Minitest::Test
     assert_equal golden("10_skillit_s2_alt_pool_default_stop_pct_json.golden"), run.to_json_output + "\n"
   end
 
+  def test_generate_default_seed_matches_golden_snapshot
+    run = Lattice.generate(file: fixture_path("constrained.json"), max_rows: 3)
+    assert_equal golden("07_constrained_s2_default_pool_default_max_rows_csv.golden"), run.to_csv + "\n"
+  end
+
+  def test_validate_bang_rejects_infeasible_model
+    error = assert_raises(Lattice::ValidationError) do
+      Lattice.validate!(file: File.join(FixtureHelpers::FIXTURES, "invalid", "no_valid_assignments.json"))
+    end
+    assert_equal ["Model has no valid complete assignments."], error.errors
+  end
+
+  def test_scenarios_are_deeply_frozen
+    run = Lattice.generate(file: fixture_path("simple.json"))
+    assert_predicate run.scenarios, :frozen?
+    run.scenarios.each { |scenario| assert_predicate scenario, :frozen? }
+  end
+
   def test_validate_bang_applies_strength_override
     model = Lattice.validate!(file: fixture_path("simple.json"), strength: 3)
     assert_equal 3, model.strength

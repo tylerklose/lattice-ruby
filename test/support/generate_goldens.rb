@@ -97,7 +97,9 @@ PROGRESS_CONFIGS = [
   { "name" => "simple_default", "fixture" => "simple.json", "kwargs" => {} },
   { "name" => "constrained_max_rows", "fixture" => "constrained.json", "kwargs" => { "max_rows" => 3 } },
   { "name" => "skillit_s3_stop_pct", "fixture" => "skillit.json",
-    "kwargs" => { "strength" => 3, "stop_after_coverage" => 75.0, "pool_size" => 5 } }
+    "kwargs" => { "strength" => 3, "stop_after_coverage" => 75.0, "pool_size" => 5 } },
+  { "name" => "simple_stop_pct_100", "fixture" => "simple.json",
+    "kwargs" => { "stop_after_coverage" => 100.0 } }
 ].freeze
 
 progress_script = <<~PYTHON

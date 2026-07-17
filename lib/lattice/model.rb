@@ -6,12 +6,7 @@ module Lattice
   NA_VALUE = "N/A"
 
   def self.normalize_scalar(value)
-    case value
-    when true then "true"
-    when false then "false"
-    when nil then "null"
-    else value.to_s
-    end
+    value.nil? ? "null" : value.to_s
   end
 
   Assignment = Data.define(:parameter, :value) do

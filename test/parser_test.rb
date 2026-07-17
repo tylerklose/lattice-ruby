@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "test_helper"
+require "stringio"
 require "yaml"
 
 class ParserTest < Minitest::Test
@@ -32,6 +33,56 @@ class ParserTest < Minitest::Test
       { "parameters" => { "a" => [1, true, nil], "b" => %w[p q] } }
     )
     assert_equal %w[1 true null], model.parameter_lookup["a"].values
+  end
+
+  def test_model_name_is_normalized_to_a_string
+    model = Lattice::Parser.parse_model_data(
+      { "model_name" => 42, "parameters" => { "a" => %w[x y], "b" => %w[p q] } }
+    )
+    assert_equal "42", model.model_name
+  end
+
+  def test_float_strength_truncates_like_python_int
+    model = Lattice::Parser.parse_model_data(
+      { "parameters" => { "a" => %w[x y], "b" => %w[p q] }, "strength" => 2.9 }
+    )
+    assert_equal 2, model.strength
+  end
+
+  def test_stdin_is_read_for_nil_and_dash_paths
+    schema = JSON.generate({ "parameters" => { "a" => %w[x y], "b" => %w[p q] } })
+    [nil, "-"].each do |path|
+      with_stdin(schema) do
+        assert_equal %w[a b], Lattice::Parser.load_model(path).parameter_names
+      end
+    end
+  end
+
+  def test_blank_stdin_raises_model_io_error
+    with_stdin("   \n") do
+      error = assert_raises(Lattice::ModelIOError) { Lattice::Parser.load_model(nil) }
+      assert_equal "No model content found on stdin.", error.message
+    end
+  end
+
+  def test_yaml_timestamps_are_permitted
+    model = Lattice::Parser.parse_model_data(
+      Lattice::Parser.safe_load_yaml(<<~YAML)
+        parameters:
+          released: [2024-01-15, 2024-06-01]
+          when: [2024-01-15 10:00:00, 2024-06-01 12:30:00]
+      YAML
+    )
+    assert_equal %w[2024-01-15 2024-06-01], model.parameter_lookup["released"].values
+    assert_equal 2, model.parameter_lookup["when"].values.length
+  end
+
+  def with_stdin(text)
+    original = $stdin
+    $stdin = StringIO.new(text)
+    yield
+  ensure
+    $stdin = original
   end
 
   def test_invalid_duplicate_values_raise_validation_error

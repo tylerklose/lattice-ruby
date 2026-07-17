@@ -108,8 +108,13 @@ YAML is parsed with Psych here and PyYAML in Python — both YAML 1.1 (libyaml l
 
 ```bash
 bundle install
-bundle exec rake test
+bundle exec rake test        # unit, golden-parity, and live Python-parity suites
+bundle exec mutant run       # mutation testing (see docs/mutation-testing.md)
 ```
+
+Golden fixtures are authored by the reference Python implementation; regenerate
+them with `ruby test/support/generate_goldens.rb` after intentional behavior
+changes (requires the Python checkout, see the script header).
 
 ## License
 
