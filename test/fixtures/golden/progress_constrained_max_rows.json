@@ -1,0 +1,50 @@
+[
+  {
+    "event": "enumerating",
+    "scenario": 0,
+    "covered": 109,
+    "total": 109,
+    "cumulative_pct": 100.0,
+    "uncovered": 0
+  },
+  {
+    "event": "enumerated",
+    "scenario": 0,
+    "covered": 0,
+    "total": 97,
+    "cumulative_pct": 0.0,
+    "uncovered": 97
+  },
+  {
+    "event": "scenario",
+    "scenario": 1,
+    "covered": 21,
+    "total": 97,
+    "cumulative_pct": 21.6,
+    "uncovered": 76
+  },
+  {
+    "event": "scenario",
+    "scenario": 2,
+    "covered": 42,
+    "total": 97,
+    "cumulative_pct": 43.3,
+    "uncovered": 55
+  },
+  {
+    "event": "scenario",
+    "scenario": 3,
+    "covered": 59,
+    "total": 97,
+    "cumulative_pct": 60.8,
+    "uncovered": 38
+  },
+  {
+    "event": "stopped",
+    "scenario": 3,
+    "covered": 59,
+    "total": 97,
+    "cumulative_pct": 60.8,
+    "uncovered": 38
+  }
+]

@@ -10,7 +10,7 @@ module Lattice
   # Output rendering. Table, JSON, CSV, and summary formats are byte-identical
   # to the Python implementation's output for the same model and result.
   module Formatters
-    module_function
+    extend self
 
     def render_output(model, result, output_format:, seed:)
       case output_format

@@ -18,7 +18,7 @@ module Lattice
   end
 
   module Parser
-    module_function
+    extend self
 
     def load_model(path, strength_override: nil)
       text, source_name, extension = read_model_input(path)

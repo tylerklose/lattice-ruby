@@ -60,7 +60,7 @@ module Lattice
       end
     end
 
-    module_function
+    extend self
 
     def default_codex_skill_path
       codex_home = ENV.fetch("CODEX_HOME", nil)

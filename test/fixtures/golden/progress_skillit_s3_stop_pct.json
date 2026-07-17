@@ -1,0 +1,242 @@
+[
+  {
+    "event": "enumerating",
+    "scenario": 0,
+    "covered": 677,
+    "total": 677,
+    "cumulative_pct": 100.0,
+    "uncovered": 0
+  },
+  {
+    "event": "enumerated",
+    "scenario": 0,
+    "covered": 0,
+    "total": 663,
+    "cumulative_pct": 0.0,
+    "uncovered": 663
+  },
+  {
+    "event": "scenario",
+    "scenario": 1,
+    "covered": 35,
+    "total": 663,
+    "cumulative_pct": 5.3,
+    "uncovered": 628
+  },
+  {
+    "event": "scenario",
+    "scenario": 2,
+    "covered": 69,
+    "total": 663,
+    "cumulative_pct": 10.4,
+    "uncovered": 594
+  },
+  {
+    "event": "scenario",
+    "scenario": 3,
+    "covered": 99,
+    "total": 663,
+    "cumulative_pct": 14.9,
+    "uncovered": 564
+  },
+  {
+    "event": "scenario",
+    "scenario": 4,
+    "covered": 126,
+    "total": 663,
+    "cumulative_pct": 19.0,
+    "uncovered": 537
+  },
+  {
+    "event": "scenario",
+    "scenario": 5,
+    "covered": 150,
+    "total": 663,
+    "cumulative_pct": 22.6,
+    "uncovered": 513
+  },
+  {
+    "event": "scenario",
+    "scenario": 6,
+    "covered": 180,
+    "total": 663,
+    "cumulative_pct": 27.1,
+    "uncovered": 483
+  },
+  {
+    "event": "scenario",
+    "scenario": 7,
+    "covered": 202,
+    "total": 663,
+    "cumulative_pct": 30.5,
+    "uncovered": 461
+  },
+  {
+    "event": "scenario",
+    "scenario": 8,
+    "covered": 223,
+    "total": 663,
+    "cumulative_pct": 33.6,
+    "uncovered": 440
+  },
+  {
+    "event": "scenario",
+    "scenario": 9,
+    "covered": 246,
+    "total": 663,
+    "cumulative_pct": 37.1,
+    "uncovered": 417
+  },
+  {
+    "event": "scenario",
+    "scenario": 10,
+    "covered": 267,
+    "total": 663,
+    "cumulative_pct": 40.3,
+    "uncovered": 396
+  },
+  {
+    "event": "scenario",
+    "scenario": 11,
+    "covered": 285,
+    "total": 663,
+    "cumulative_pct": 43.0,
+    "uncovered": 378
+  },
+  {
+    "event": "scenario",
+    "scenario": 12,
+    "covered": 306,
+    "total": 663,
+    "cumulative_pct": 46.2,
+    "uncovered": 357
+  },
+  {
+    "event": "scenario",
+    "scenario": 13,
+    "covered": 331,
+    "total": 663,
+    "cumulative_pct": 49.9,
+    "uncovered": 332
+  },
+  {
+    "event": "scenario",
+    "scenario": 14,
+    "covered": 347,
+    "total": 663,
+    "cumulative_pct": 52.3,
+    "uncovered": 316
+  },
+  {
+    "event": "scenario",
+    "scenario": 15,
+    "covered": 363,
+    "total": 663,
+    "cumulative_pct": 54.8,
+    "uncovered": 300
+  },
+  {
+    "event": "scenario",
+    "scenario": 16,
+    "covered": 383,
+    "total": 663,
+    "cumulative_pct": 57.8,
+    "uncovered": 280
+  },
+  {
+    "event": "scenario",
+    "scenario": 17,
+    "covered": 400,
+    "total": 663,
+    "cumulative_pct": 60.3,
+    "uncovered": 263
+  },
+  {
+    "event": "scenario",
+    "scenario": 18,
+    "covered": 410,
+    "total": 663,
+    "cumulative_pct": 61.8,
+    "uncovered": 253
+  },
+  {
+    "event": "scenario",
+    "scenario": 19,
+    "covered": 423,
+    "total": 663,
+    "cumulative_pct": 63.8,
+    "uncovered": 240
+  },
+  {
+    "event": "scenario",
+    "scenario": 20,
+    "covered": 431,
+    "total": 663,
+    "cumulative_pct": 65.0,
+    "uncovered": 232
+  },
+  {
+    "event": "scenario",
+    "scenario": 21,
+    "covered": 440,
+    "total": 663,
+    "cumulative_pct": 66.4,
+    "uncovered": 223
+  },
+  {
+    "event": "scenario",
+    "scenario": 22,
+    "covered": 445,
+    "total": 663,
+    "cumulative_pct": 67.1,
+    "uncovered": 218
+  },
+  {
+    "event": "scenario",
+    "scenario": 23,
+    "covered": 451,
+    "total": 663,
+    "cumulative_pct": 68.0,
+    "uncovered": 212
+  },
+  {
+    "event": "scenario",
+    "scenario": 24,
+    "covered": 455,
+    "total": 663,
+    "cumulative_pct": 68.6,
+    "uncovered": 208
+  },
+  {
+    "event": "scenario",
+    "scenario": 25,
+    "covered": 472,
+    "total": 663,
+    "cumulative_pct": 71.2,
+    "uncovered": 191
+  },
+  {
+    "event": "scenario",
+    "scenario": 26,
+    "covered": 489,
+    "total": 663,
+    "cumulative_pct": 73.8,
+    "uncovered": 174
+  },
+  {
+    "event": "scenario",
+    "scenario": 27,
+    "covered": 500,
+    "total": 663,
+    "cumulative_pct": 75.4,
+    "uncovered": 163
+  },
+  {
+    "event": "stopped",
+    "scenario": 27,
+    "covered": 500,
+    "total": 663,
+    "cumulative_pct": 75.4,
+    "uncovered": 163
+  }
+]

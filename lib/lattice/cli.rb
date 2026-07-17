@@ -19,7 +19,7 @@ module Lattice
       "forward_dep, bidirectional, conditional, and forced; parameters may use " \
       "weights. Run `lattice agent instructions` for the full schema workflow."
 
-    module_function
+    extend self
 
     def main(argv = ARGV)
       command = argv.first

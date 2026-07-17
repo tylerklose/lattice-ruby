@@ -15,7 +15,7 @@ module Lattice
   # the highest-scoring full row from a seeded candidate pool. Deterministic
   # for a given seed, and row-for-row identical to the Python implementation.
   module IPOG
-    module_function
+    extend self
 
     def generate_covering_array(
       model,

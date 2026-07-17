@@ -70,3 +70,60 @@ end
 
 File.write(File.join(GOLDEN_DIR, "manifest.json"), JSON.pretty_generate(manifest) + "\n")
 puts "wrote manifest.json (#{manifest.length} configurations)"
+
+# --- Validation-error goldens: Python's `validate --format json` output for
+# every invalid fixture, asserted in-process by test/validation_errors_test.rb.
+
+ERRORS_DIR = File.join(GOLDEN_DIR, "errors")
+FileUtils.mkdir_p(ERRORS_DIR)
+
+Dir[File.join(FIXTURES, "invalid", "*.json")].sort.each do |fixture|
+  name = File.basename(fixture, ".json")
+  stdout, stderr, run_status = Open3.capture3(
+    { "PYTHONPATH" => PYTHON_SRC },
+    PYTHON, "-m", "lattice", "validate", "--format", "json", fixture
+  )
+  abort "expected #{name} to be invalid, got exit 0: #{stdout}" if run_status.success?
+  abort "python validate crashed for #{name}: #{stderr}" if stdout.strip.empty?
+
+  File.write(File.join(ERRORS_DIR, "#{name}.json"), stdout)
+  puts "wrote errors/#{name}.json"
+end
+
+# --- Progress-event goldens: the exact GenerationProgress sequences emitted by
+# the Python implementation, asserted in-process by test/progress_events_test.rb.
+
+PROGRESS_CONFIGS = [
+  { "name" => "simple_default", "fixture" => "simple.json", "kwargs" => {} },
+  { "name" => "constrained_max_rows", "fixture" => "constrained.json", "kwargs" => { "max_rows" => 3 } },
+  { "name" => "skillit_s3_stop_pct", "fixture" => "skillit.json",
+    "kwargs" => { "strength" => 3, "stop_after_coverage" => 75.0, "pool_size" => 5 } }
+].freeze
+
+progress_script = <<~PYTHON
+  import dataclasses, json, sys
+  from lattice.parser import load_model
+  from lattice.ipog import generate_covering_array
+
+  config = json.loads(sys.argv[1])
+  events = []
+  model = load_model(config["fixture"])
+  generate_covering_array(
+      model,
+      progress=lambda p: events.append(dataclasses.asdict(p)),
+      **config["kwargs"],
+  )
+  print(json.dumps(events, indent=2))
+PYTHON
+
+PROGRESS_CONFIGS.each do |config|
+  payload = { "fixture" => File.join(FIXTURES, config.fetch("fixture")), "kwargs" => config.fetch("kwargs") }
+  stdout, stderr, run_status = Open3.capture3(
+    { "PYTHONPATH" => PYTHON_SRC },
+    PYTHON, "-c", progress_script, JSON.generate(payload)
+  )
+  abort "python progress capture failed for #{config.fetch('name')}: #{stderr}" unless run_status.success?
+
+  File.write(File.join(GOLDEN_DIR, "progress_#{config.fetch('name')}.json"), stdout)
+  puts "wrote progress_#{config.fetch('name')}.json"
+end
