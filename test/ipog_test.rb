@@ -71,6 +71,40 @@ class IpogTest < Minitest::Test
     assert_match(/stop_after_coverage/, error.message)
   end
 
+  def test_generation_rejects_model_with_no_valid_assignments
+    model = Lattice::Parser.parse_model_data(
+      JSON.parse(File.read(File.join(FixtureHelpers::FIXTURES, "invalid", "no_valid_assignments.json")))
+    )
+    error = assert_raises(ArgumentError) { Lattice::IPOG.generate_covering_array(model) }
+    assert_equal "Model has no valid full assignments.", error.message
+  end
+
+  def test_enumerate_valid_tuples_matches_generation_total
+    model = load_fixture("constrained.json")
+    engine = Lattice::ConstraintEngine.new(model)
+    tuples = Lattice::IPOG.enumerate_valid_tuples(model, engine, 2)
+    result = Lattice::IPOG.generate_covering_array(model)
+
+    assert_equal result.total_valid_tuples, tuples.length
+    assert_equal tuples.uniq, tuples
+  end
+
+  def test_score_row_counts_new_tuples_and_sums_normalized_weights
+    model = Lattice.parse_model(
+      {
+        "parameters" => {
+          "a" => { "values" => %w[x y], "weights" => [0.7, 0.3] },
+          "b" => %w[p q]
+        }
+      }
+    )
+    uncovered = Set.new([[[0, 0], [1, 0]], [[0, 1], [1, 1]]])
+
+    assert_equal [1, 0.7 + 0.5], Lattice::IPOG.score_row(model, [0, 0], uncovered, 2)
+    assert_equal [1, 0.3 + 0.5], Lattice::IPOG.score_row(model, [1, 1], uncovered, 2)
+    assert_equal [0, 0.7 + 0.5], Lattice::IPOG.score_row(model, [0, 1], uncovered, 2)
+  end
+
   def test_constrained_generation_covers_valid_pairs_and_forced_interaction
     model = load_fixture("constrained.json")
     result = Lattice::IPOG.generate_covering_array(model, seed: 42, pool_size: 20)

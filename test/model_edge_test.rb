@@ -29,8 +29,8 @@ class ModelEdgeTest < Minitest::Test
   end
 
   def test_with_strength_preserves_everything_else
-    changed = model.with(strength: 2)
-    assert_equal 2, changed.strength
+    changed = model.with(strength: 3)
+    assert_equal 3, changed.strength
     assert_equal model.model_name, changed.model_name
     assert_equal model.parameters, changed.parameters
     assert_equal model.constraints, changed.constraints
@@ -40,6 +40,22 @@ class ModelEdgeTest < Minitest::Test
     parameter = model.parameter_lookup["a"]
     assert parameter.value_set.include?("1")
     refute parameter.value_set.include?("9")
+  end
+
+  def test_default_strength_is_two
+    bare = Lattice::Model.new(model_name: "m", parameters: model.parameters, constraints: [])
+    assert_equal 2, bare.strength
+  end
+
+  def test_collections_are_frozen
+    assert_predicate model.parameters, :frozen?
+    assert_predicate model.constraints, :frozen?
+    assert_predicate model.parameter_names, :frozen?
+    assert_predicate model.parameter_lookup, :frozen?
+    parameter = model.parameter_lookup["a"]
+    assert_predicate parameter.values, :frozen?
+    assert_predicate parameter.value_set, :frozen?
+    assert_predicate parameter.normalized_weights, :frozen?
   end
 
   def test_zero_total_weights_fall_back_to_uniform

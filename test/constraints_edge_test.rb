@@ -24,6 +24,34 @@ class ConstraintsEdgeTest < Minitest::Test
     Lattice::Assignment.new(parameter:, value:)
   end
 
+  def test_conflicts_is_symmetric
+    left = assignment("loyalty", "gold")
+    right = assignment("card_type", "N/A")
+    assert engine.conflicts?(left, right)
+    assert engine.conflicts?(right, left)
+  end
+
+  def test_bidirectional_excludes_other_values_of_the_pair
+    assert engine.conflicts?(assignment("browser", "safari"), assignment("os", "windows"))
+    assert engine.conflicts?(assignment("os", "macos"), assignment("browser", "chrome"))
+  end
+
+  def test_requirements_propagate_transitively
+    chained = Lattice.parse_model(
+      {
+        "parameters" => { "a" => %w[x y], "b" => %w[p q], "c" => %w[m n] },
+        "constraints" => [
+          { "type" => "forward_dep", "source" => { "parameter" => "a", "value" => "x" },
+            "target" => { "parameter" => "b", "value" => "p" } },
+          { "type" => "forward_dep", "source" => { "parameter" => "b", "value" => "p" },
+            "target" => { "parameter" => "c", "value" => "m" } }
+        ]
+      }
+    )
+    requirements = Lattice::ConstraintEngine.new(chained).implied_requirements(assignment("a", "x"))
+    assert_includes requirements, assignment("c", "m")
+  end
+
   def test_conflicts_is_false_for_compatible_assignments
     refute engine.conflicts?(assignment("region", "US"), assignment("currency", "USD"))
   end

@@ -27,6 +27,13 @@ class ParserTest < Minitest::Test
     assert_equal ["visa", "mastercard", "N/A"], model.parameter_lookup["card_type"].values
   end
 
+  def test_values_normalize_non_string_scalars
+    model = Lattice::Parser.parse_model_data(
+      { "parameters" => { "a" => [1, true, nil], "b" => %w[p q] } }
+    )
+    assert_equal %w[1 true null], model.parameter_lookup["a"].values
+  end
+
   def test_invalid_duplicate_values_raise_validation_error
     assert_raises(Lattice::ValidationError) do
       Lattice::Parser.parse_model_data({ "parameters" => { "browser" => %w[chrome chrome] } })

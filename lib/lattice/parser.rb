@@ -369,7 +369,6 @@ module Lattice
       strength =
         case raw_strength
         when nil then 2
-        when Integer then raw_strength
         when Numeric then raw_strength.to_i
         else
           begin

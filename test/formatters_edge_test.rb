@@ -65,6 +65,23 @@ class FormattersEdgeTest < Minitest::Test
     assert_empty payload["scenarios"]
   end
 
+  def test_headline_uses_thousands_separators
+    parameters = ("a".."d").map { |name| Lattice::Parameter.new(name:, values: (1..8).map(&:to_s)) }
+    model = Lattice::Model.new(model_name: "big", parameters: parameters, constraints: [])
+
+    assert_equal "Lattice — 0 scenarios (from 4,096 possible)",
+                 Lattice::Formatters.headline(model, empty_result)
+  end
+
+  def test_format_csv_strips_surrounding_whitespace_only
+    model = Lattice.parse_model({ "parameters" => { " padded" => %w[1 2], "b" => %w[x y] } })
+    result = Lattice::IPOG.generate_covering_array(model)
+    csv = Lattice::Formatters.format_csv(model, result)
+
+    assert csv.start_with?("padded,b"), "leading whitespace must be stripped like Python's strip()"
+    refute csv.end_with?("\r\n")
+  end
+
   def test_format_summary_headline_counts
     model = load_fixture("simple.json")
     result = Lattice::IPOG.generate_covering_array(model)

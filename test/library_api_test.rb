@@ -97,6 +97,16 @@ class LibraryApiTest < Minitest::Test
     assert_equal run.scenarios, yielded
   end
 
+  def test_generate_default_pool_size_matches_golden_snapshot
+    run = Lattice.generate(file: fixture_path("skillit.json"), seed: 7, stop_after_coverage: 75.0)
+    assert_equal golden("10_skillit_s2_alt_pool_default_stop_pct_json.golden"), run.to_json_output + "\n"
+  end
+
+  def test_validate_bang_applies_strength_override
+    model = Lattice.validate!(file: fixture_path("simple.json"), strength: 3)
+    assert_equal 3, model.strength
+  end
+
   def test_validate_bang_returns_model_for_valid_schema
     model = Lattice.validate!(file: fixture_path("constrained.json"))
     assert_equal "payments", model.model_name
