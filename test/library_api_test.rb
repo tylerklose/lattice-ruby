@@ -3,6 +3,13 @@
 require_relative "test_helper"
 
 class LibraryApiTest < Minitest::Test
+  cover "Lattice.generate"
+  cover "Lattice.parse_model"
+  cover "Lattice.scenarios"
+  cover "Lattice.validate!"
+  cover "Lattice::Run*"
+  cover "Lattice::Parser*"
+
   include FixtureHelpers
 
   def test_generate_from_file_returns_named_scenarios

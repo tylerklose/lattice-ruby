@@ -1,0 +1,13 @@
+trade,location_mode,per_diem,relocation,union,pay_range,skills
+electrician,local,true,true,union,present,zero
+plumber,local,true,true,union,present,zero
+carpenter,local,true,true,union,present,zero
+laborer,local,true,true,union,present,zero
+electrician,statewide,true,true,union,present,zero
+electrician,nationwide,true,false,union,present,zero
+electrician,local,false,true,union,present,zero
+electrician,local,true,true,open_shop,present,zero
+electrician,local,true,true,all,present,zero
+electrician,local,true,true,union,absent,zero
+electrician,local,true,true,union,present,one
+electrician,local,true,true,union,present,two_plus

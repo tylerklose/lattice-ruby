@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "model_name": "simple",
+    "strength": 1,
+    "test_count": 3,
+    "exhaustive_count": 8,
+    "reduction": "2.7x",
+    "coverage": "83.3%",
+    "seed": 7
+  },
+  "coverage_curve": [
+    {
+      "scenario": 1,
+      "cumulative_pct": 50.0
+    },
+    {
+      "scenario": 2,
+      "cumulative_pct": 66.7
+    },
+    {
+      "scenario": 3,
+      "cumulative_pct": 83.3
+    }
+  ],
+  "scenarios": [
+    {
+      "id": 1,
+      "values": {
+        "a": "0",
+        "b": "0",
+        "c": "0"
+      }
+    },
+    {
+      "id": 2,
+      "values": {
+        "a": "1",
+        "b": "0",
+        "c": "0"
+      }
+    },
+    {
+      "id": 3,
+      "values": {
+        "a": "0",
+        "b": "1",
+        "c": "0"
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+# Lattice schema over Lattice's own generation-pipeline option surface.
+# Generated rows drive test/golden_parity_test.rb: each row is one CLI
+# configuration whose Python-implementation output is snapshotted as a golden
+# file and asserted against the Ruby implementation in-process (so mutation
+# testing can use it). Regenerate goldens with test/support/generate_goldens.rb.
+model_name: lattice_generation_surface
+parameters:
+  schema: [simple, constrained, skillit]   # none / all six constraint types + weights / large invalid_pair-only
+  strength: ["1", "2", "3"]
+  seed: [default, alt]                     # 42 / 7
+  pool_size: [minimal, default]            # 1 (deterministic-only path) / 50
+  row_limit: [none, max_rows, stop_pct]    # unlimited / --max-rows 3 / --stop-after-coverage 75
+  format: [json, table, csv, summary]
+constraints:
+  # The deepest interaction — every constraint type active at strength 3 —
+  # must appear in at least one generated configuration.
+  - type: forced
+    assignments:
+      - {parameter: schema, value: constrained}
+      - {parameter: strength, value: "3"}

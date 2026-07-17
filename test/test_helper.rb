@@ -5,6 +5,14 @@ require "json"
 
 require "lattice"
 
+# Load mutant's `cover` DSL when available so test classes can declare which
+# subjects they kill mutations for; no-op under plain `rake test` without it.
+begin
+  require "mutant/minitest/coverage"
+rescue LoadError
+  Minitest::Test.define_singleton_method(:cover) { |_expression| }
+end
+
 module FixtureHelpers
   FIXTURES = File.expand_path("fixtures", __dir__)
 

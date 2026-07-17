@@ -3,6 +3,10 @@
 require_relative "test_helper"
 
 class ModelTest < Minitest::Test
+  cover "Lattice::Parameter*"
+  cover "Lattice::Model*"
+  cover "Lattice.normalize_scalar"
+
   def test_normalize_scalar_canonicalizes_yaml_scalars
     assert_equal "true", Lattice.normalize_scalar(true)
     assert_equal "false", Lattice.normalize_scalar(false)

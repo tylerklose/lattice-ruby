@@ -1,0 +1,8 @@
+Lattice — 3 scenarios (from 864 possible)
+
+
+# | trade       | location_mode | per_diem | relocation | union | pay_range | skills
+--|-------------|---------------|----------|------------|-------|-----------|-------
+1 | electrician | local         | true     | true       | union | present   | zero  
+2 | electrician | local         | false    | true       | union | present   | zero  
+3 | electrician | local         | true     | false      | union | present   | zero  

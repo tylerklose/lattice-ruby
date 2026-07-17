@@ -1,0 +1,27 @@
+---
+usage: opensource
+integration:
+  name: minitest
+includes:
+  - lib
+requires:
+  - lattice
+matcher:
+  subjects:
+    - Lattice::MersenneTwister*
+    - Lattice::Parameter*
+    - Lattice::Model*
+    - Lattice::Assignment*
+    - Lattice::Parser*
+    - Lattice::ConstraintEngine*
+    - Lattice::IPOG*
+    - Lattice::Formatters*
+    - Lattice::Run*
+    - Lattice.normalize_scalar
+    - Lattice.generate
+    - Lattice.parse_model
+    - Lattice.scenarios
+    - Lattice.validate!
+  # Lattice::CLI and Lattice::Agent are process-boundary glue exercised by
+  # subprocess tests (test/cli_test.rb, test/python_parity_test.rb), which
+  # cannot kill in-process mutations — excluded from mutation coverage.

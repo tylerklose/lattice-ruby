@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1,
+    "slug": "01_constrained_s3_default_pool_minimal_none_json",
+    "values": {
+      "schema": "constrained",
+      "strength": "3",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "none",
+      "format": "json"
+    }
+  },
+  {
+    "id": 2,
+    "slug": "02_simple_s1_default_pool_default_max_rows_table",
+    "values": {
+      "schema": "simple",
+      "strength": "1",
+      "seed": "default",
+      "pool_size": "default",
+      "row_limit": "max_rows",
+      "format": "table"
+    }
+  },
+  {
+    "id": 3,
+    "slug": "03_simple_s2_alt_pool_minimal_stop_pct_csv",
+    "values": {
+      "schema": "simple",
+      "strength": "2",
+      "seed": "alt",
+      "pool_size": "minimal",
+      "row_limit": "stop_pct",
+      "format": "csv"
+    }
+  },
+  {
+    "id": 4,
+    "slug": "04_simple_s3_alt_pool_default_none_summary",
+    "values": {
+      "schema": "simple",
+      "strength": "3",
+      "seed": "alt",
+      "pool_size": "default",
+      "row_limit": "none",
+      "format": "summary"
+    }
+  },
+  {
+    "id": 5,
+    "slug": "05_simple_s1_alt_pool_minimal_max_rows_json",
+    "values": {
+      "schema": "simple",
+      "strength": "1",
+      "seed": "alt",
+      "pool_size": "minimal",
+      "row_limit": "max_rows",
+      "format": "json"
+    }
+  },
+  {
+    "id": 6,
+    "slug": "06_constrained_s1_default_pool_minimal_stop_pct_summary",
+    "values": {
+      "schema": "constrained",
+      "strength": "1",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "stop_pct",
+      "format": "summary"
+    }
+  },
+  {
+    "id": 7,
+    "slug": "07_constrained_s2_default_pool_default_max_rows_csv",
+    "values": {
+      "schema": "constrained",
+      "strength": "2",
+      "seed": "default",
+      "pool_size": "default",
+      "row_limit": "max_rows",
+      "format": "csv"
+    }
+  },
+  {
+    "id": 8,
+    "slug": "08_constrained_s2_alt_pool_minimal_none_table",
+    "values": {
+      "schema": "constrained",
+      "strength": "2",
+      "seed": "alt",
+      "pool_size": "minimal",
+      "row_limit": "none",
+      "format": "table"
+    }
+  },
+  {
+    "id": 9,
+    "slug": "09_skillit_s1_default_pool_minimal_none_csv",
+    "values": {
+      "schema": "skillit",
+      "strength": "1",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "none",
+      "format": "csv"
+    }
+  },
+  {
+    "id": 10,
+    "slug": "10_skillit_s2_alt_pool_default_stop_pct_json",
+    "values": {
+      "schema": "skillit",
+      "strength": "2",
+      "seed": "alt",
+      "pool_size": "default",
+      "row_limit": "stop_pct",
+      "format": "json"
+    }
+  },
+  {
+    "id": 11,
+    "slug": "11_skillit_s3_default_pool_minimal_max_rows_table",
+    "values": {
+      "schema": "skillit",
+      "strength": "3",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "max_rows",
+      "format": "table"
+    }
+  },
+  {
+    "id": 12,
+    "slug": "12_skillit_s2_default_pool_default_max_rows_summary",
+    "values": {
+      "schema": "skillit",
+      "strength": "2",
+      "seed": "default",
+      "pool_size": "default",
+      "row_limit": "max_rows",
+      "format": "summary"
+    }
+  },
+  {
+    "id": 13,
+    "slug": "13_simple_s3_default_pool_minimal_stop_pct_table",
+    "values": {
+      "schema": "simple",
+      "strength": "3",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "stop_pct",
+      "format": "table"
+    }
+  },
+  {
+    "id": 14,
+    "slug": "14_simple_s3_default_pool_minimal_none_csv",
+    "values": {
+      "schema": "simple",
+      "strength": "3",
+      "seed": "default",
+      "pool_size": "minimal",
+      "row_limit": "none",
+      "format": "csv"
+    }
+  }
+]

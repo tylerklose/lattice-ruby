@@ -3,6 +3,8 @@
 require_relative "test_helper"
 
 class ConstraintsTest < Minitest::Test
+  cover "Lattice::ConstraintEngine*"
+
   include FixtureHelpers
 
   def engine

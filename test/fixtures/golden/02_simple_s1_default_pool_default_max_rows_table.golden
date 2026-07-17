@@ -1,0 +1,11 @@
+Lattice — 2 scenarios (from 8 possible)
+
+  50% coverage at scenario #1
+  75% coverage at scenario #2
+  90% coverage at scenario #2
+  100% coverage at scenario #2
+
+# | a | b | c
+--|---|---|--
+1 | 0 | 0 | 0
+2 | 1 | 1 | 1

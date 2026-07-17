@@ -1,0 +1,30 @@
+Lattice — 21 scenarios (from 288 possible)
+
+  50% coverage at scenario #5
+  75% coverage at scenario #8
+  90% coverage at scenario #15
+  100% coverage at scenario #21
+
+ # | payment_method | region | currency | os      | browser | loyalty | card_type 
+---|----------------|--------|----------|---------|---------|---------|-----------
+ 1 | apple_pay      | US     | USD      | macos   | safari  | none    | N/A       
+ 2 | credit_card    | US     | USD      | macos   | safari  | none    | visa      
+ 3 | credit_card    | UK     | USD      | macos   | safari  | none    | visa      
+ 4 | credit_card    | US     | GBP      | macos   | safari  | none    | visa      
+ 5 | credit_card    | US     | USD      | windows | chrome  | none    | visa      
+ 6 | credit_card    | US     | USD      | macos   | safari  | gold    | visa      
+ 7 | credit_card    | US     | USD      | macos   | safari  | none    | mastercard
+ 8 | paypal         | US     | USD      | macos   | safari  | none    | N/A       
+ 9 | paypal         | UK     | USD      | macos   | safari  | none    | N/A       
+10 | paypal         | US     | GBP      | macos   | safari  | none    | N/A       
+11 | paypal         | US     | USD      | windows | chrome  | none    | N/A       
+12 | apple_pay      | UK     | GBP      | macos   | safari  | none    | N/A       
+13 | credit_card    | UK     | USD      | windows | chrome  | none    | visa      
+14 | credit_card    | UK     | USD      | macos   | safari  | gold    | visa      
+15 | credit_card    | UK     | USD      | macos   | safari  | none    | mastercard
+16 | credit_card    | US     | GBP      | windows | chrome  | none    | visa      
+17 | credit_card    | US     | GBP      | macos   | safari  | gold    | visa      
+18 | credit_card    | US     | GBP      | macos   | safari  | none    | mastercard
+19 | credit_card    | US     | USD      | windows | chrome  | gold    | visa      
+20 | credit_card    | US     | USD      | windows | chrome  | none    | mastercard
+21 | credit_card    | US     | USD      | macos   | safari  | gold    | mastercard

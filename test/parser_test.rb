@@ -4,6 +4,8 @@ require_relative "test_helper"
 require "yaml"
 
 class ParserTest < Minitest::Test
+  cover "Lattice::Parser*"
+
   def test_yaml_mapping_parameters_and_conditional_parameter_are_supported
     raw = YAML.safe_load(<<~YAML)
       model_name: checkout

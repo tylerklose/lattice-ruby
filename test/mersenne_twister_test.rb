@@ -5,6 +5,8 @@ require_relative "test_helper"
 # Golden values generated with CPython 3:
 #   random.Random(seed).getrandbits(64) / .random()
 class MersenneTwisterTest < Minitest::Test
+  cover "Lattice::MersenneTwister*"
+
   def test_getrandbits_matches_cpython
     rng = Lattice::MersenneTwister.new(42)
     assert_equal 2_053_695_854_357_871_005, rng.getrandbits(64)
@@ -27,5 +29,29 @@ class MersenneTwisterTest < Minitest::Test
 
   def test_zero_seed_matches_cpython
     assert_equal 0.8444218515250481, Lattice::MersenneTwister.new(0).random
+  end
+
+  def test_long_sequences_cross_state_refills_like_cpython
+    rng = Lattice::MersenneTwister.new(42)
+    seq = Array.new(1000) { rng.random }
+    assert_equal 0.24952973922292443, seq[312]
+    assert_equal 0.5445623787105787, seq[699]
+    assert_equal 0.8554501933059546, seq[999]
+  end
+
+  def test_getrandbits_widths_match_cpython
+    expected = { 1 => 1, 7 => 81, 31 => 1_373_158_606, 32 => 2_746_317_213,
+                 33 => 2_746_317_213, 63 => 1_026_847_926_404_610_461 }
+    expected.each do |bits, value|
+      assert_equal value, Lattice::MersenneTwister.new(42).getrandbits(bits), "getrandbits(#{bits})"
+    end
+    assert_equal 252_336_560_693_540_533_935_881_068_298_825_202_077,
+                 Lattice::MersenneTwister.new(42).getrandbits(128)
+  end
+
+  def test_seed_edge_cases_match_cpython
+    assert_equal 0.11299430095636409, Lattice::MersenneTwister.new(2**32).random
+    assert_equal 0.6394267984578837, Lattice::MersenneTwister.new(-42).random
+    assert_equal 0.13436424411240122, Lattice::MersenneTwister.new(1).random
   end
 end

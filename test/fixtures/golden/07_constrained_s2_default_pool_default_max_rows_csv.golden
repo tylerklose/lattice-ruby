@@ -1,0 +1,4 @@
+payment_method,region,currency,os,browser,loyalty,card_type
+apple_pay,US,USD,macos,safari,none,N/A
+credit_card,US,GBP,windows,chrome,gold,visa
+credit_card,UK,USD,macos,safari,gold,mastercard

@@ -3,6 +3,9 @@
 require_relative "test_helper"
 
 class IpogTest < Minitest::Test
+  cover "Lattice::IPOG*"
+  cover "Lattice::ConstraintEngine*"
+
   include FixtureHelpers
 
   def verify_coverage(model, rows, strength)
