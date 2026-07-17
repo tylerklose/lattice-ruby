@@ -52,11 +52,13 @@ The schema is the contract. The generated rows are the source of truth. The sche
 command -v lattice >/dev/null 2>&1 && lattice --help >/dev/null
 ```
 
-If it fails, install from PyPI:
+If it fails, install the Ruby gem from RubyGems (or add `gem "lattice-cli"` to the project Gemfile):
 
 ```bash
-pipx install lattice-cli
+gem install lattice-cli
 ```
+
+The Python implementation (`pipx install lattice-cli` from PyPI) is interchangeable — both produce byte-identical output for the same schema and seed.
 
 ## Workflow
 
@@ -124,6 +126,11 @@ Do not silently encode current behavior and hedge with `bug_signal:`-style annot
 In a checkout of the Lattice source where the package is not installed:
 
 ```bash
+# Ruby checkout
+cat schema.json | ruby -Ilib exe/lattice validate
+cat schema.json | ruby -Ilib exe/lattice generate
+
+# Python checkout
 cat schema.json | PYTHONPATH=src python3 -m lattice validate
 cat schema.json | PYTHONPATH=src python3 -m lattice generate
 ```
