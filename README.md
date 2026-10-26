@@ -4,7 +4,7 @@ Deterministic combinatorial coverage for constrained variant surfaces — roles,
 
 Lattice takes a schema of parameters, values, and constraints and generates a minimal covering array: the smallest practical set of scenarios in which every valid pair (or triple, at strength 3) of values appears at least once. Constraints are honored during generation, so no scenario is ever invalid.
 
-This is the Ruby implementation of [lattice-cli on PyPI](https://pypi.org/project/lattice-cli/). Same schema format, same algorithm, same seeds — **byte-identical output** for the same schema, seed, and pool size. That parity is enforced by the test suite, which runs both implementations and diffs their output. Use whichever runtime your project already has.
+This is the Ruby implementation of [Lattice](https://github.com/tylerklose/lattice) ([lattice-cli on PyPI](https://pypi.org/project/lattice-cli/)). Same schema format, same algorithm, same seeds — **byte-identical output** for the same schema, seed, and pool size. That parity is enforced by the test suite, which runs both implementations and diffs their output. Use whichever runtime your project already has.
 
 ## Install
 
