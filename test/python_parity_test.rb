@@ -52,7 +52,7 @@ class PythonParityTest < Minitest::Test
     assert_equal python_out, ruby_out, "output diverged for `lattice #{args.join(' ')}` on #{fixture}"
   end
 
-  %w[simple.json constrained.json skillit.json yaml_edges.json].each do |fixture|
+  %w[simple.json constrained.json skillit.json yaml_edges.json scalar_text.yaml scalar_text.json].each do |fixture|
     fixture_slug = fixture.sub(".json", "").tr(".-", "_")
 
     define_method("test_generate_json_parity_#{fixture_slug}") do
