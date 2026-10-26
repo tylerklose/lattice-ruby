@@ -52,10 +52,10 @@ The schema is the contract. The generated rows are the source of truth. The sche
 command -v lattice >/dev/null 2>&1 && lattice --help >/dev/null
 ```
 
-If it fails, install the Ruby gem from RubyGems (or add `gem "lattice-cli"` to the project Gemfile):
+If it fails, install the Ruby gem from RubyGems (or add `gem "latticerb"` to the project Gemfile):
 
 ```bash
-gem install lattice-cli
+gem install latticerb
 ```
 
 The Python implementation (`pipx install lattice-cli` from PyPI) is interchangeable — both produce byte-identical output for the same schema and seed.

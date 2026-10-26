@@ -10,13 +10,13 @@ This is the Ruby implementation of [Lattice](https://github.com/tylerklose/latti
 
 ```ruby
 # Gemfile
-gem "lattice-cli"
+gem "latticerb"
 ```
 
 or standalone:
 
 ```bash
-gem install lattice-cli
+gem install latticerb
 ```
 
 ## Library usage

@@ -3,7 +3,7 @@
 require_relative "lib/lattice/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "lattice-cli"
+  spec.name = "latticerb"
   spec.version = Lattice::VERSION
   spec.authors = ["Tyler Klose"]
   spec.email = ["tylerklose@gmail.com"]
