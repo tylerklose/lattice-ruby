@@ -32,6 +32,7 @@ module Lattice
     def to_json_output = Formatters.render_output(model, result, output_format: "json", seed:)
     def to_csv = Formatters.render_output(model, result, output_format: "csv", seed:)
     def to_summary = Formatters.render_output(model, result, output_format: "summary", seed:)
+    def to_yaml_output = Formatters.render_output(model, result, output_format: "yaml", seed:)
   end
 
   class << self

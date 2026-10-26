@@ -65,7 +65,7 @@ module Lattice
       }
       parser = OptionParser.new do |opts|
         opts.on("--strength STRENGTH", Integer)
-        opts.on("--format FORMAT", %w[table json csv summary])
+        opts.on("--format FORMAT", %w[table json csv summary yaml])
         opts.on("--seed SEED", Integer)
         opts.on("--pool-size SIZE", Integer) { |value| options[:pool_size] = value }
         opts.on("--max-rows ROWS", Integer) { |value| options[:max_rows] = value }

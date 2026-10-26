@@ -54,7 +54,7 @@ run = Lattice.generate(
 
 run.scenarios        # array of { name => value } hashes
 run.coverage_curve   # cumulative coverage per scenario
-run.to_table         # human-readable table (also: to_json_output, to_csv, to_summary)
+run.to_table         # human-readable table (also: to_json_output, to_yaml_output, to_csv, to_summary)
 
 Lattice.scenarios(file: "...")  # shortcut straight to the hashes
 Lattice.validate!(schema)       # raises Lattice::ValidationError / Lattice::ConstraintError
@@ -70,6 +70,7 @@ The gem installs a `lattice` executable mirroring the Python CLI:
 cat schema.yaml | lattice validate
 cat schema.yaml | lattice generate                 # JSON by default
 lattice generate schema.yaml --format table
+lattice generate schema.yaml --format yaml         # same content as JSON, for hand-edited files
 lattice generate schema.yaml --strength 3 --seed 7
 lattice agent instructions                          # coding-agent integration guidance
 ```
