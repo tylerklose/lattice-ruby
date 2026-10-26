@@ -3,6 +3,9 @@
 require "json"
 require "optparse"
 
+# Bundler auto-requires the `lattice-cli` gem as "lattice/cli", so load the
+# full library API too.
+require_relative "../lattice"
 require_relative "agent"
 require_relative "constraints"
 require_relative "formatters"
