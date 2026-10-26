@@ -79,7 +79,8 @@ module Lattice
           }
         end
       }
-      JSON.pretty_generate(payload, ascii_only: true)
+      # Python's json.dumps also escapes DEL, which Ruby's ascii_only leaves raw.
+      JSON.pretty_generate(payload, ascii_only: true).gsub("\u007f", "\\u007f")
     end
 
     # Same content as format_json, written by hand in one fixed style so Ruby
@@ -143,13 +144,16 @@ module Lattice
       "\"#{escaped}\""
     end
 
+    # Matches Python's csv.writer: empty fields are written bare, except a row
+    # made of a single empty field, which is written as "" so it isn't a blank
+    # line.
     def format_csv(model, result)
-      CSV.generate(row_sep: "\r\n") do |csv|
-        csv << model.parameter_names
-        named_rows(model, result).each do |row|
-          csv << model.parameter_names.map { |name| row[name] }
-        end
-      end.strip
+      records = [model.parameter_names] + named_rows(model, result).map do |row|
+        model.parameter_names.map { |name| row[name] }
+      end
+      records.map do |record|
+        record == [""] ? "\"\"\r\n" : CSV.generate_line(record, row_sep: "\r\n", quote_empty: false)
+      end.join.strip
     end
 
     def headline(model, result)
