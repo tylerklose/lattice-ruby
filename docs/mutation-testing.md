@@ -56,6 +56,15 @@ than distort the code or tests to kill:
   validation makes impossible (e.g. a forced constraint with zero parsed
   assignments raises during parsing, so the engine-side guard can't fire).
 
+- **JSON-version-dependent options.** `SchemaText.load_json` passes
+  `allow_duplicate_key: false` for json 3.x (which checks duplicates itself
+  and skips a custom `object_class#[]=`) and `UniqueHash` for json 2.x. The
+  suite runs on one json version, so mutants to whichever path that version
+  ignores survive.
+- **Anchor bookkeeping on unanchored nodes.** In `SchemaText#yaml_value`,
+  dropping the `if node.anchor` guards only stores values under a `nil`
+  anchor, which no alias can name.
+
 - **Interpreter-crash false alives.** At least one survivor (`while nil &&
   ...` in `IPOG#generate_covering_array`) is trivially fatal but triggers a
   CRuby 3.4.7 (+PRISM) `[BUG] Stack consistency error` — the forked kill

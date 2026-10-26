@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require "json"
-require "yaml"
-
 require_relative "model"
+require_relative "schema_text"
 
 module Lattice
   class ModelIOError < StandardError; end
@@ -78,16 +76,12 @@ module Lattice
 
       errors = []
       loaders.each do |loader|
-        return loader == :json ? JSON.parse(text) : safe_load_yaml(text)
+        return loader == :json ? SchemaText.load_json(text) : SchemaText.load_yaml(text)
       rescue StandardError => e
         errors << e.message
       end
 
       raise ModelIOError, "Unable to parse model from `#{source_name}`: #{errors.join('; ')}"
-    end
-
-    def safe_load_yaml(text)
-      YAML.safe_load(text, permitted_classes: [Date, Time], aliases: true)
     end
 
     def parse_parameters(raw_parameters, errors)
@@ -351,8 +345,9 @@ module Lattice
       end
 
       parsed = []
-      raw_weights.each do |weight|
-        unless weight.is_a?(Numeric)
+      raw_weights.each do |raw_weight|
+        weight = parse_number(raw_weight)
+        if weight.nil?
           errors << "`weights` for parameter `#{parameter_name}` must be numeric."
           return nil
         end
@@ -360,24 +355,37 @@ module Lattice
           errors << "`weights` for parameter `#{parameter_name}` must be greater than zero."
           return nil
         end
-        parsed << weight.to_f
+        parsed << weight
       end
       parsed
+    end
+
+    DECIMAL_TEXT = /\A[-+]?[0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?\z/
+    INTEGER_TEXT = /\A[-+]?[0-9]+\z/
+
+    # A finite number, from a Ruby number or decimal text such as "0.7" or
+    # "1e-3" (schema files keep numbers as text). Booleans are not numbers.
+    def parse_number(raw)
+      number =
+        case raw
+        when Integer, Float then raw.to_f
+        when String then DECIMAL_TEXT.match?(raw) ? Float(raw) : nil
+        end
+      number&.finite? ? number : nil
     end
 
     def parse_strength(raw_strength, parameter_count, errors)
       strength =
         case raw_strength
         when nil then 2
-        when Numeric then raw_strength.to_i
-        else
-          begin
-            Integer(raw_strength)
-          rescue TypeError, ArgumentError
-            errors << "`strength` must be an integer."
-            return 2
-          end
+        when Integer then raw_strength
+        when Float then raw_strength.finite? ? raw_strength.to_i : nil
+        when String then INTEGER_TEXT.match?(raw_strength) ? Integer(raw_strength, 10) : nil
         end
+      if strength.nil?
+        errors << "`strength` must be an integer."
+        return 2
+      end
 
       errors << "`strength` must be at least 1." if strength < 1
       errors << "`strength` cannot exceed the number of parameters." if parameter_count.positive? && strength > parameter_count

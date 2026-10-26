@@ -99,11 +99,22 @@ constraints:
 
 Constraint types: `invalid_pair`, `higher_order`, `forward_dep`, `bidirectional`, `conditional`, `forced`. Run `lattice agent instructions` for the full reference.
 
+### Values keep their text
+
+Every value in a schema (the model name, parameter names and values, and constraint references) is used exactly as written. In YAML, unquoted `1.10`, `0x1F`, `.inf` or `2026-10-26T10:00:00Z` stay as typed rather than being turned into numbers or dates. The exceptions:
+
+- Unquoted `yes`, `no`, `on`, `off`, `true` and `false` (lowercase, Capitalized or UPPERCASE) become `true` / `false`, and an empty value, `~` or `null` becomes `null`. Quote them (`"yes"`) to keep the word.
+- JSON integers are written in plain decimal form (`-0` becomes `0`).
+
+`strength` must be a whole number, and `weights` decimal numbers such as `0.7` or `1e-3`. Anchors, aliases and `<<` merge keys work; a key written twice, more than one YAML document, or a tag other than YAML's standard ones is an error.
+
+Changed in 0.3.0: earlier versions converted unquoted numbers and dates, so `0x1F` became `31`, `1.10` became `1.1`, and some values (`.inf`, timestamps) came out differently in the Ruby and Python implementations.
+
 ## Parity with the Python implementation
 
 The generator seeds an MT19937 RNG that reproduces CPython's `random.Random` bit-for-bit, so both implementations walk the same candidate pools and pick the same rows. `test/python_parity_test.rb` shells out to the Python implementation (checkout via `LATTICE_PYTHON_SRC`, or an installed `lattice-cli`) and asserts byte-equal output across formats, seeds, strengths, and stopping rules; it skips when no Python implementation is available.
 
-YAML is parsed with Psych here and PyYAML in Python — both YAML 1.1 (libyaml lineage), so common scalars including unquoted `yes`/`no`/`on`/`off` booleans resolve identically. Exotic YAML 1.1 corners (e.g. sexagesimal numbers) may differ between the two parsers; quote ambiguous scalars or use JSON if in doubt.
+Schemas are read with Psych here and PyYAML in Python, but both implementations build values from the parsed text with the same rules (see "Values keep their text"), so a schema means the same thing in either. `test/fixtures/scalar_text.*` pins those rules for both.
 
 ## Development
 

@@ -65,16 +65,16 @@ class ParserTest < Minitest::Test
     end
   end
 
-  def test_yaml_timestamps_are_permitted
+  def test_yaml_timestamps_keep_their_text
     model = Lattice::Parser.parse_model_data(
-      Lattice::Parser.safe_load_yaml(<<~YAML)
+      Lattice::SchemaText.load_yaml(<<~YAML)
         parameters:
           released: [2024-01-15, 2024-06-01]
-          when: [2024-01-15 10:00:00, 2024-06-01 12:30:00]
+          when: [2024-01-15 10:00:00, 2024-06-01T12:30:00Z]
       YAML
     )
     assert_equal %w[2024-01-15 2024-06-01], model.parameter_lookup["released"].values
-    assert_equal 2, model.parameter_lookup["when"].values.length
+    assert_equal ["2024-01-15 10:00:00", "2024-06-01T12:30:00Z"], model.parameter_lookup["when"].values
   end
 
   def with_stdin(text)
