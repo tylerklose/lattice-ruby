@@ -19,6 +19,25 @@ class FormattersEdgeTest < Minitest::Test
     assert_equal "Unknown format `xml`.", error.message
   end
 
+  def test_csv_writes_empty_fields_bare_like_python
+    model = Lattice.parse_model({ "model_name" => "m", "parameters" => { "a" => ["", "x"], "b" => ["", "y"] }, "strength" => 1 })
+    result = Lattice::GenerationResult.new(rows: [[0, 0], [1, 0], [0, 1]], coverage_curve: [], total_valid_tuples: 0)
+    assert_equal "a,b\r\n,\r\nx,\r\n,y", Lattice::Formatters.format_csv(model, result)
+  end
+
+  def test_csv_quotes_a_row_holding_one_empty_field
+    model = Lattice.parse_model({ "model_name" => "m", "parameters" => { "a" => ["", "x"] }, "strength" => 1 })
+    result = Lattice::GenerationResult.new(rows: [[0], [1], [0]], coverage_curve: [], total_valid_tuples: 0)
+    assert_equal "a\r\n\"\"\r\nx\r\n\"\"", Lattice::Formatters.format_csv(model, result)
+  end
+
+  def test_json_escapes_del_like_python
+    model = Lattice.parse_model({ "model_name" => "m" + 0x7f.chr, "parameters" => { "a" => ["x"] }, "strength" => 1 })
+    json = Lattice::Formatters.format_json(model, empty_result, seed: 1)
+    assert_includes json, '"model_name": "m' + "\\" + 'u007f"'
+    refute_includes json, 0x7f.chr
+  end
+
   def test_reduction_label_variants
     assert_equal "2x", Lattice::Formatters.reduction_label(6, 3)
     assert_equal "1.5x", Lattice::Formatters.reduction_label(6, 4)
