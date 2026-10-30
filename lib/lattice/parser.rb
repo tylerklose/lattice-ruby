@@ -18,6 +18,17 @@ module Lattice
   module Parser
     extend self
 
+    # Each constraint type and the keys written beside `type`.
+    CONSTRAINT_FIELDS = {
+      "invalid_pair" => "`if` and `then_not`",
+      "bidirectional" => "`pair`",
+      "forward_dep" => "`source` and `target`",
+      "conditional" => "`parameter`, `values`, `parent` and `applies_when`",
+      "forced" => "`assignments`",
+      "higher_order" => "`if_all` and `then_not`"
+    }.freeze
+    CONSTRAINT_TYPE_LIST = CONSTRAINT_FIELDS.keys.map { |name| "`#{name}`" }.join(", ").freeze
+
     def load_model(path, strength_override: nil)
       text, source_name, extension = read_model_input(path)
       data = deserialize_model(text, source_name, extension)
@@ -177,7 +188,17 @@ module Lattice
           next
         end
 
-        case raw_constraint["type"]
+        constraint_type = raw_constraint["type"]
+        if constraint_type.nil?
+          errors << missing_type_message(index, raw_constraint)
+          next
+        end
+        unless constraint_type.is_a?(String)
+          errors << "`constraints[#{index}].type` must be a string, one of: #{CONSTRAINT_TYPE_LIST}."
+          next
+        end
+
+        case constraint_type
         when "invalid_pair"
           if_assignment = parse_assignment(raw_constraint["if"], parameters, "`constraints[#{index}].if`", errors)
           then_not = parse_assignment(raw_constraint["then_not"], parameters, "`constraints[#{index}].then_not`", errors)
@@ -205,10 +226,21 @@ module Lattice
           constraint = parse_higher_order_constraint(raw_constraint, index, parameters, errors)
           parsed << constraint if constraint
         else
-          errors << "`constraints[#{index}]` has unknown type `#{raw_constraint['type']}`."
+          errors << "`constraints[#{index}]` has unknown type `#{constraint_type}`. Use one of: #{CONSTRAINT_TYPE_LIST}."
         end
       end
       parsed
+    end
+
+    # Explains a constraint without `type`. A type name used as a key, as in
+    # `- invalid_pair: {...}`, gets the correct form spelled out.
+    def missing_type_message(index, raw_constraint)
+      shorthand = raw_constraint.keys.find { |key| CONSTRAINT_FIELDS.key?(key) }
+      return "`constraints[#{index}]` is missing `type`. Use one of: #{CONSTRAINT_TYPE_LIST}." if shorthand.nil?
+
+      "`constraints[#{index}]` is missing `type`. Write `type: #{shorthand}` as its own key, " \
+        "with #{CONSTRAINT_FIELDS.fetch(shorthand)} beside it. " \
+        "Run `lattice agent instructions` for an example of each type."
     end
 
     def parse_conditional_constraint(raw_constraint, index, parameters, errors)

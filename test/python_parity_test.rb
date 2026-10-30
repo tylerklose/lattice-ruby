@@ -103,4 +103,15 @@ class PythonParityTest < Minitest::Test
   def test_validation_error_parity
     assert_parity("validate", fixture: "invalid.json")
   end
+
+  %w[constraint_missing_type constraint_type_shorthand constraint_type_not_string unknown_constraint_type].each do |name|
+    define_method("test_constraint_type_error_parity_#{name}") do
+      assert_parity("validate", fixture: "invalid/#{name}.json")
+    end
+  end
+
+  def test_agent_instructions_parity
+    assert_parity("agent", "instructions", fixture: "simple.json")
+    assert_parity("agent", "instructions", "--format", "json", fixture: "simple.json")
+  end
 end

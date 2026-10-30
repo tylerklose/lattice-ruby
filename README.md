@@ -97,7 +97,7 @@ constraints:
     applies_when: [credit_card]
 ```
 
-Constraint types: `invalid_pair`, `higher_order`, `forward_dep`, `bidirectional`, `conditional`, `forced`. Run `lattice agent instructions` for the full reference.
+Constraint types: `invalid_pair`, `higher_order`, `forward_dep`, `bidirectional`, `conditional`, `forced`. Every constraint needs a `type` key. Run `lattice agent instructions` for an example of each type.
 
 ### Values keep their text
 
