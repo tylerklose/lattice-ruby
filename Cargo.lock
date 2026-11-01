@@ -85,6 +85,8 @@ dependencies = [
 [[package]]
 name = "lattice-engine"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b686b7e557fb3f0246835e631958e8faaa44687e9afc2356ccd85438a952be92"
 
 [[package]]
 name = "lattice_native"

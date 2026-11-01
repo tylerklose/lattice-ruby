@@ -145,7 +145,7 @@ Schemas are read with Psych here and PyYAML in Python, but both implementations 
 
 ## Development
 
-Building the extension needs a Rust toolchain (`rustup`), and, until `lattice-engine` is on crates.io, a checkout of it next to this repo (`../lattice-engine`).
+Building the extension needs a Rust toolchain (`rustup`); the engine comes from crates.io (`lattice-engine`).
 
 ```bash
 bundle install

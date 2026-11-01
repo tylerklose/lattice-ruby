@@ -9,5 +9,5 @@ name = "lattice_native"
 crate-type = ["cdylib"]
 
 [dependencies]
-lattice-engine = { path = "../../../lattice-engine", version = "0.1.0", default-features = false }
+lattice-engine = { version = "0.1.0", default-features = false }
 magnus = "0.9"
