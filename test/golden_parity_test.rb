@@ -16,7 +16,6 @@ class GoldenParityTest < Minitest::Test
   cover "Lattice::IPOG*"
   cover "Lattice::ConstraintEngine*"
   cover "Lattice::Formatters*"
-  cover "Lattice::MersenneTwister*"
   cover "Lattice::Parser*"
   cover "Lattice::Parameter*"
   cover "Lattice::Model*"
@@ -28,7 +27,7 @@ class GoldenParityTest < Minitest::Test
 
   SCHEMA_FILES = { "simple" => "simple.json", "constrained" => "constrained.json", "skillit" => "skillit.json" }.freeze
   SEEDS = { "default" => 42, "alt" => 7 }.freeze
-  POOL_SIZES = { "minimal" => 1, "default" => 50 }.freeze
+  POOL_SIZES = { "minimal" => 1, "default" => 16 }.freeze
   MAX_ROWS_LIMIT = 3
   STOP_PCT_LIMIT = 75.0
 

@@ -63,23 +63,23 @@ class LibraryApiTest < Minitest::Test
   def golden(name) = File.read(File.join(GOLDEN_DIR, name))
 
   def test_run_to_csv_matches_golden_snapshot
-    run = Lattice.generate(file: fixture_path("simple.json"), strength: 3, pool_size: 1)
-    assert_equal golden("14_simple_s3_default_pool_minimal_none_csv.golden"), run.to_csv + "\n"
+    run = Lattice.generate(file: fixture_path("simple.json"), strength: 2, seed: 7, pool_size: 1)
+    assert_equal golden("07_simple_s2_alt_pool_minimal_none_csv.golden"), run.to_csv + "\n"
   end
 
   def test_run_to_summary_matches_golden_snapshot
-    run = Lattice.generate(file: fixture_path("simple.json"), strength: 3, seed: 7)
-    assert_equal golden("04_simple_s3_alt_pool_default_none_summary.golden"), run.to_summary + "\n"
+    run = Lattice.generate(file: fixture_path("skillit.json"), strength: 1)
+    assert_equal golden("04_skillit_s1_default_pool_default_none_summary.golden"), run.to_summary + "\n"
   end
 
   def test_run_to_table_matches_golden_snapshot
-    run = Lattice.generate(file: fixture_path("simple.json"), strength: 3, pool_size: 1, stop_after_coverage: 75)
-    assert_equal golden("13_simple_s3_default_pool_minimal_stop_pct_table.golden"), run.to_table + "\n"
+    run = Lattice.generate(file: fixture_path("simple.json"), strength: 3, seed: 7, stop_after_coverage: 75)
+    assert_equal golden("06_simple_s3_alt_pool_default_stop_pct_table.golden"), run.to_table + "\n"
   end
 
   def test_run_to_json_output_matches_golden_snapshot
-    run = Lattice.generate(file: fixture_path("simple.json"), strength: 1, seed: 7, pool_size: 1, max_rows: 3)
-    assert_equal golden("05_simple_s1_alt_pool_minimal_max_rows_json.golden"), run.to_json_output + "\n"
+    run = Lattice.generate(file: fixture_path("simple.json"), strength: 1, seed: 7, max_rows: 3)
+    assert_equal golden("02_simple_s1_alt_pool_default_max_rows_json.golden"), run.to_json_output + "\n"
   end
 
   def test_run_exposes_seed_model_and_coverage_curve
@@ -98,13 +98,23 @@ class LibraryApiTest < Minitest::Test
   end
 
   def test_generate_default_pool_size_matches_golden_snapshot
-    run = Lattice.generate(file: fixture_path("skillit.json"), seed: 7, stop_after_coverage: 75.0)
-    assert_equal golden("10_skillit_s2_alt_pool_default_stop_pct_json.golden"), run.to_json_output + "\n"
+    run = Lattice.generate(file: fixture_path("constrained.json"), strength: 1, stop_after_coverage: 75.0)
+    assert_equal golden("08_constrained_s1_default_pool_default_stop_pct_csv.golden"), run.to_csv + "\n"
   end
 
   def test_generate_default_seed_matches_golden_snapshot
     run = Lattice.generate(file: fixture_path("constrained.json"), max_rows: 3)
-    assert_equal golden("07_constrained_s2_default_pool_default_max_rows_csv.golden"), run.to_csv + "\n"
+    assert_equal golden("05_constrained_s2_default_pool_default_max_rows_table.golden"), run.to_table + "\n"
+  end
+
+  # skillit.json is the fixture whose rows change with the seed and the
+  # candidate count, so it pins both defaults.
+  def test_generate_defaults_to_seed_42_and_16_candidates
+    skillit = fixture_path("skillit.json")
+    default = Lattice.generate(file: skillit).scenarios
+    assert_equal Lattice.generate(file: skillit, seed: 42, pool_size: 16).scenarios, default
+    refute_equal Lattice.generate(file: skillit, seed: 0).scenarios, default
+    refute_equal Lattice.generate(file: skillit, pool_size: 15).scenarios, default
   end
 
   def test_validate_bang_rejects_infeasible_model

@@ -59,7 +59,7 @@ module Lattice
       options = {
         format: "json",
         seed: 42,
-        pool_size: 50,
+        pool_size: 16,
         progress: false,
         progress_every: 10
       }
@@ -67,7 +67,7 @@ module Lattice
         opts.on("--strength STRENGTH", Integer)
         opts.on("--format FORMAT", %w[table json csv summary yaml])
         opts.on("--seed SEED", Integer)
-        opts.on("--pool-size SIZE", Integer) { |value| options[:pool_size] = value }
+        opts.on("--pool-size SIZE", Integer, "Candidate rows built per step; more can mean fewer scenarios.") { |value| options[:pool_size] = value }
         opts.on("--max-rows ROWS", Integer) { |value| options[:max_rows] = value }
         opts.on("--stop-after-coverage PCT", Float) { |value| options[:stop_after_coverage] = value }
         opts.on("--progress")
@@ -117,7 +117,7 @@ module Lattice
     def load_and_check_model(model_path, options)
       model = Parser.load_model(model_path, strength_override: options[:strength])
       engine = ConstraintEngine.new(model)
-      raise ValidationError, ["Model has no valid complete assignments."] unless engine.can_complete?({})
+      raise ValidationError, ["Model has no valid complete assignments."] unless engine.satisfiable?
 
       model
     rescue ValidationError => e

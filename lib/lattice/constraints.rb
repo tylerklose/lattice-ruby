@@ -3,18 +3,21 @@
 require "set"
 
 require_relative "model"
+require_relative "native"
 
 module Lattice
   class ConstraintError < StandardError; end
 
-  # Compiles model constraints into invalid-pair / requirement closures and
-  # answers feasibility questions over partial assignments. Assignments are
-  # referenced as `[parameter_index, value_index]` pairs; partial assignments
-  # are `{parameter_index => value_index}` hashes.
+  # Compiles a model's constraints to the engine's primitives (invalid pairs,
+  # requirements, higher-order exclusions, forced interactions), checks the
+  # compiled closure for contradictions, and asks the Rust engine whether the
+  # model and its forced interactions are satisfiable. Python's
+  # lattice.constraints does the same, so both report the same errors.
+  # Assignments are `[parameter_index, value_index]` pairs.
   class ConstraintEngine
     EMPTY_SET = Set.new.freeze
 
-    attr_reader :model, :forced_interactions
+    attr_reader :model, :forced_interactions, :native
 
     def initialize(model)
       @model = model
@@ -29,51 +32,56 @@ module Lattice
       @requires = {}
       @higher_order = []
       @forced_interactions = []
-      @feasibility_cache = {}
       compile_constraints
       compute_implied_pairs
       validate_compiled_constraints
+      @native = native_model(model.strength)
+      @satisfiable = check_feasibility
+    end
+
+    # Whether any row satisfies every constraint.
+    def satisfiable?
+      @satisfiable
+    end
+
+    # Whether some valid row contains every assignment in `partial`
+    # (a `{parameter_index => value_index}` hash).
+    def can_complete?(partial)
+      native.can_complete?(partial.sort)
+    end
+
+    def native_model(strength)
+      compiled = engine_constraints
+      Engine::Model.new(
+        model.parameters.map { |parameter| parameter.values.length },
+        model.parameters.map(&:normalized_weights),
+        strength,
+        compiled.fetch(:invalid_pairs),
+        compiled.fetch(:requires),
+        compiled.fetch(:higher_order),
+        compiled.fetch(:forced)
+      )
     end
 
     def conflicts?(left, right)
       invalid_pairs_for(to_ref(left)).include?(to_ref(right))
     end
 
+    # The compiled constraints as the generation engine takes them: invalid
+    # pairs and requirements as sorted [[p, v], [q, w]] lists, higher-order
+    # exclusions and forced interactions in compile order. Python's
+    # lattice.ipog builds the same lists, so the engine gets identical input.
+    def engine_constraints
+      {
+        invalid_pairs: ref_pairs(@invalid_pairs),
+        requires: ref_pairs(@requires),
+        higher_order: @higher_order,
+        forced: @forced_interactions
+      }
+    end
+
     def implied_requirements(assignment)
       requires_for(to_ref(assignment)).map { |ref| from_ref(ref) }.sort
-    end
-
-    def can_complete?(partial)
-      normalized = normalize_partial(partial.dup)
-      return false if normalized.nil?
-
-      signature = normalized.sort
-      cached = @feasibility_cache[signature]
-      return cached unless cached.nil?
-
-      result = !backtrack_complete(normalized, rng: nil, failures: Set.new).nil?
-      @feasibility_cache[signature] = result
-      result
-    end
-
-    def complete_assignment(partial, rng: nil)
-      normalized = normalize_partial(partial.dup)
-      return nil if normalized.nil?
-
-      backtrack_complete(normalized, rng:, failures: Set.new)
-    end
-
-    def complete_assignment_valid?(row)
-      partial = row.each_with_index.to_h { |value_index, parameter_index| [parameter_index, value_index] }
-      normalized = normalize_partial(partial)
-      return false if normalized.nil? || normalized.length != model.parameters.length
-
-      @higher_order.each do |antecedents, forbidden|
-        if antecedents.all? { |parameter_index, value_index| normalized[parameter_index] == value_index }
-          return false if normalized[forbidden[0]] == forbidden[1]
-        end
-      end
-      true
     end
 
     private
@@ -187,125 +195,21 @@ module Lattice
         end
       end
 
-      @forced_interactions.each do |forced|
-        partial = forced.to_h { |parameter_index, value_index| [parameter_index, value_index] }
-        next unless complete_assignment(partial, rng: nil).nil?
-
-        assignments = forced.map do |parameter_index, value_index|
-          parameter = model.parameters[parameter_index]
-          "#{parameter.name}=#{parameter.values[value_index]}"
-        end.join(", ")
-        raise ConstraintError, "Forced interaction is not feasible: #{assignments}."
-      end
     end
 
-    def normalize_partial(partial)
-      normalized = partial.dup
-      changed = true
-      while changed
-        changed = false
-        return nil unless partial_consistent?(normalized)
-
-        normalized.to_a.each do |parameter_index, value_index|
-          requires_for([parameter_index, value_index]).each do |required_parameter, required_value|
-            current = normalized[required_parameter]
-            if current.nil?
-              normalized[required_parameter] = required_value
-              changed = true
-            elsif current != required_value
-              return nil
-            end
-          end
-        end
-      end
-      return nil unless partial_consistent?(normalized)
-
-      normalized
-    end
-
-    def partial_consistent?(partial)
-      partial.each do |parameter_index, value_index|
-        partial.each do |other_parameter, other_value|
-          next if parameter_index == other_parameter
-
-          return false if invalid_pairs_for([parameter_index, value_index]).include?([other_parameter, other_value])
-        end
-      end
-
-      @higher_order.each do |antecedents, forbidden|
-        if antecedents.all? { |parameter_index, value_index| partial[parameter_index] == value_index }
-          return false if partial[forbidden[0]] == forbidden[1]
-        end
-      end
+    # Raises for the first impossible forced interaction; otherwise returns
+    # whether the model has any valid row.
+    def check_feasibility
+      native.feasibility
       true
-    end
-
-    def backtrack_complete(partial, rng:, failures:)
-      signature = partial.sort
-      return nil if failures.include?(signature)
-
-      if partial.length == model.parameters.length
-        row = (0...model.parameters.length).map { |index| partial.fetch(index) }
-        return complete_assignment_valid?(row) ? row : nil
-      end
-
-      next_parameter, values = next_parameter_values(partial)
-      if next_parameter.nil?
-        failures.add(signature)
-        return nil
-      end
-
-      ordered_values(next_parameter, values, rng).each do |value|
-        candidate = partial.dup
-        candidate[next_parameter] = value
-        normalized = normalize_partial(candidate)
-        next if normalized.nil?
-
-        result = backtrack_complete(normalized, rng:, failures:)
-        return result unless result.nil?
-      end
-
-      failures.add(signature)
-      nil
-    end
-
-    def next_parameter_values(partial)
-      best_parameter = nil
-      best_values = []
-      best_size = nil
-
-      model.parameters.each_with_index do |parameter, parameter_index|
-        next if partial.key?(parameter_index)
-
-        feasible = []
-        (0...parameter.values.length).each do |value_index|
-          candidate = partial.dup
-          candidate[parameter_index] = value_index
-          feasible << value_index unless normalize_partial(candidate).nil?
-        end
-
-        return [nil, []] if feasible.empty?
-
-        if best_size.nil? || feasible.length < best_size
-          best_parameter = parameter_index
-          best_values = feasible
-          best_size = feasible.length
-        end
-      end
-
-      [best_parameter, best_values]
-    end
-
-    def ordered_values(parameter_index, values, rng)
-      parameter = model.parameters[parameter_index]
-      if rng.nil?
-        return values.sort_by { |value_index| [-parameter.normalized_weights[value_index], value_index] }
-      end
-
-      values
-        .map { |value_index| [rng.random / [parameter.normalized_weights[value_index], 1e-9].max, value_index] }
-        .sort
-        .map { |_, value_index| value_index }
+    rescue Engine::ForcedInfeasible => e
+      assignments = @forced_interactions.fetch(Integer(e.message)).map do |parameter_index, value_index|
+        parameter = model.parameters[parameter_index]
+        "#{parameter.name}=#{parameter.values[value_index]}"
+      end.join(", ")
+      raise ConstraintError, "Forced interaction is not feasible: #{assignments}."
+    rescue Engine::NoValidAssignments
+      false
     end
 
     def exclude_other_values(source, required)
@@ -328,6 +232,10 @@ module Lattice
 
     def invalid_pairs_for(ref)
       @invalid_pairs[ref] || EMPTY_SET
+    end
+
+    def ref_pairs(table)
+      table.flat_map { |source, targets| targets.map { |target| [source, target] } }.sort
     end
 
     def requires_for(ref)

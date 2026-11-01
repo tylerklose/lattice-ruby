@@ -1,0 +1,9 @@
+Lattice — 3 scenarios (from 288 possible)
+
+  50% coverage at scenario #3
+
+# | payment_method | region | currency | os      | browser | loyalty | card_type 
+--|----------------|--------|----------|---------|---------|---------|-----------
+1 | apple_pay      | US     | USD      | macos   | safari  | none    | N/A       
+2 | credit_card    | US     | GBP      | windows | chrome  | gold    | visa      
+3 | credit_card    | UK     | USD      | macos   | safari  | gold    | mastercard

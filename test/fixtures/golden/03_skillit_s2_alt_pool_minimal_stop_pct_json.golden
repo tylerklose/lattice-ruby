@@ -5,7 +5,7 @@
     "test_count": 7,
     "exhaustive_count": 864,
     "reduction": "123.4x",
-    "coverage": "75.0%",
+    "coverage": "77.0%",
     "seed": 7
   },
   "coverage_curve": [
@@ -15,27 +15,27 @@
     },
     {
       "scenario": 2,
-      "cumulative_pct": 27.6
+      "cumulative_pct": 27.0
     },
     {
       "scenario": 3,
-      "cumulative_pct": 38.8
+      "cumulative_pct": 40.1
     },
     {
       "scenario": 4,
-      "cumulative_pct": 50.0
+      "cumulative_pct": 51.3
     },
     {
       "scenario": 5,
-      "cumulative_pct": 59.2
+      "cumulative_pct": 60.5
     },
     {
       "scenario": 6,
-      "cumulative_pct": 67.8
+      "cumulative_pct": 69.1
     },
     {
       "scenario": 7,
-      "cumulative_pct": 75.0
+      "cumulative_pct": 77.0
     }
   ],
   "scenarios": [
@@ -44,10 +44,10 @@
       "values": {
         "trade": "electrician",
         "location_mode": "local",
-        "per_diem": "true",
-        "relocation": "true",
+        "per_diem": "false",
+        "relocation": "false",
         "union": "union",
-        "pay_range": "present",
+        "pay_range": "absent",
         "skills": "zero"
       }
     },
@@ -57,20 +57,20 @@
         "trade": "electrician",
         "location_mode": "statewide",
         "per_diem": "false",
-        "relocation": "false",
+        "relocation": "true",
         "union": "open_shop",
-        "pay_range": "absent",
+        "pay_range": "present",
         "skills": "one"
       }
     },
     {
       "id": 3,
       "values": {
-        "trade": "electrician",
+        "trade": "laborer",
         "location_mode": "nationwide",
         "per_diem": "true",
         "relocation": "false",
-        "union": "all",
+        "union": "union",
         "pay_range": "present",
         "skills": "two_plus"
       }
@@ -78,11 +78,11 @@
     {
       "id": 4,
       "values": {
-        "trade": "plumber",
-        "location_mode": "local",
+        "trade": "carpenter",
+        "location_mode": "statewide",
         "per_diem": "false",
         "relocation": "true",
-        "union": "union",
+        "union": "all",
         "pay_range": "absent",
         "skills": "two_plus"
       }
@@ -94,9 +94,9 @@
         "location_mode": "statewide",
         "per_diem": "true",
         "relocation": "true",
-        "union": "open_shop",
-        "pay_range": "present",
-        "skills": "one"
+        "union": "union",
+        "pay_range": "absent",
+        "skills": "zero"
       }
     },
     {
@@ -107,20 +107,20 @@
         "per_diem": "false",
         "relocation": "false",
         "union": "all",
-        "pay_range": "absent",
-        "skills": "zero"
+        "pay_range": "present",
+        "skills": "one"
       }
     },
     {
       "id": 7,
       "values": {
         "trade": "carpenter",
-        "location_mode": "local",
+        "location_mode": "nationwide",
         "per_diem": "true",
         "relocation": "false",
-        "union": "union",
-        "pay_range": "absent",
-        "skills": "one"
+        "union": "open_shop",
+        "pay_range": "present",
+        "skills": "zero"
       }
     }
   ]

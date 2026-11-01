@@ -26,36 +26,48 @@ Python implementation (regenerate with `ruby test/support/generate_goldens.rb`):
   fixture under `test/fixtures/invalid/`.
 - `test/progress_events_test.rb` — exact `GenerationProgress` event sequences.
 
-Because the Ruby implementation is a byte-parity port, killing a mutant and
-checking parity are usually the same act: a mutation that survives either does
-not change observable behavior or marks a divergence the goldens cannot see.
+Killing a mutant and checking parity are usually the same act: a mutation that
+survives either does not change observable behavior or marks a divergence the
+goldens cannot see.
+
+Since 0.4.0, generation and feasibility checks run in the Rust engine
+(`lattice-engine`), which mutant can't reach. The engine has its own tests,
+including brute-force checks that every valid tuple is covered and every row
+is valid. Mutant covers the Ruby side: parsing, compiling constraints for the
+engine, closure checks, the coverage curve and the output formats.
 
 ## Accepted survivor categories
 
-The final full run scores 98.0% (163 alive of 8,120 mutations, spread over 26
-of 86 subjects; 1,756 further mutants died by timeout — infinite-loop
-mutations). The residue is dominated by mutants we accept deliberately rather
-than distort the code or tests to kill:
+The 0.4.0 full run scores 92.1% (473 alive of 6,013 mutations, spread over 45
+of 77 subjects; 36 more died by timeout).
 
-- **Redundant bit-masking in the RNG.** `MersenneTwister` mirrors CPython's
-  MT19937, including masks that are provably no-ops on already-32-bit values
-  (e.g. `(y << 15) & 0xefc60000` is 32-bit before the final `& MASK32`).
-  Removing them is semantics-preserving; the masks stay because they mirror
-  the reference C/CPython implementation line for line.
-- **Guard-boundary equivalents.** `@mti >= N` vs `== N` (the index never
-  exceeds `N`), `bits < 32` vs `< 33` (shifting by zero is a no-op), and
-  similar boundaries that extra state can never reach.
+That is lower than the 98.0% reported for 0.3.x, but the tests did not get
+weaker. The 0.3.x generator was slow enough that many test runs hit mutant's
+5-second limit, and a timeout counts as a kill. Re-running two subjects at
+v0.3.1 showed it: 145 of `Parser#parse_constraints`' 438 mutations and 24 of
+`Formatters#format_table`'s 335 were "killed" only by timing out, including
+plainly equivalent ones such as `row[name]` → `row.fetch(name)`. The 0.4.0
+suite finishes in time, so those mutants are now reported as what they are.
+
+The residue is mutants we accept deliberately rather than distort the code or
+tests to kill:
+
 - **Accessor spelling.** `[]` vs `.at`/`.fetch` on indices/keys that are
   always present by construction.
-- **Pure-optimization removals.** The backtracking failure memo and the
-  feasibility cache only affect speed, never results; mutants that disable
-  them time out on large models and survive on small ones.
+- **Guarded construction after recorded errors.** In `Parser#parse_constraints`
+  and its helpers, a constraint is only built when its assignments parsed
+  (`if left && right`). When one didn't, an error is already recorded and the
+  whole parse raises, so building it anyway (`if true`) is never observed.
+- **Guard-boundary equivalents.** `row_count >= max_rows` vs `==` (rows are
+  added one at a time), and similar boundaries extra state can never reach.
 - **Type-check spelling.** `is_a?(Hash)` vs `instance_of?(Hash)` — JSON/YAML
   deserialization only ever produces exact core classes.
+- **Fixpoint shortcuts.** In `ConstraintEngine#compute_implied_pairs`, the
+  closure loop repeats until nothing changes; mutants that skip a shortcut or
+  re-check an addition reach the same closure.
 - **Unreachable-state guards.** Branches that defend states earlier
   validation makes impossible (e.g. a forced constraint with zero parsed
   assignments raises during parsing, so the engine-side guard can't fire).
-
 - **JSON-version-dependent options.** `SchemaText.load_json` passes
   `allow_duplicate_key: false` for json 3.x (which checks duplicates itself
   and skips a custom `object_class#[]=`) and `UniqueHash` for json 2.x. The
@@ -65,14 +77,12 @@ than distort the code or tests to kill:
   dropping the `if node.anchor` guards only stores values under a `nil`
   anchor, which no alias can name.
 
-- **Interpreter-crash false alives.** At least one survivor (`while nil &&
-  ...` in `IPOG#generate_covering_array`) is trivially fatal but triggers a
-  CRuby 3.4.7 (+PRISM) `[BUG] Stack consistency error` — the forked kill
-  process dies before the failing assertion can register, so mutant cannot
-  record the kill. Verified by applying the mutation by hand: the golden
-  suite crashes the VM immediately.
-
 When a survivor exposed genuinely redundant code rather than a missing test,
 the code was simplified instead: `normalize_scalar`'s explicit `true`/`false`
 branches (`to_s` already produces the canonical strings) and `parse_strength`'s
 `Integer` branch (`Integer#to_i` is identity) were removed on those grounds.
+In 0.4.0 the same went for the 100% special case in `coverage_target_for`, the
+zero-total guard in `coverage_pct`, defensive copies in `engine_constraints`,
+and the value ordering in the old constraint search; survivors that pointed at
+missing tests got new invalid fixtures (bad assignments in each constraint
+type, errors after a non-object constraint).

@@ -8,7 +8,7 @@ parameters:
   schema: [simple, constrained, skillit]   # none / all six constraint types + weights / large invalid_pair-only
   strength: ["1", "2", "3"]
   seed: [default, alt]                     # 42 / 7
-  pool_size: [minimal, default]            # 1 (deterministic-only path) / 50
+  pool_size: [minimal, default]            # 1 candidate per row / 16 (the default)
   row_limit: [none, max_rows, stop_pct]    # unlimited / --max-rows 3 / --stop-after-coverage 75
   format: [json, table, csv, summary]
 constraints:

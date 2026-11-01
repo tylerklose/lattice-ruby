@@ -8,7 +8,6 @@ requires:
   - lattice
 matcher:
   subjects:
-    - Lattice::MersenneTwister*
     - Lattice::Parameter*
     - Lattice::Model*
     - Lattice::Assignment*

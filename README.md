@@ -4,7 +4,7 @@ Deterministic combinatorial coverage for constrained variant surfaces — roles,
 
 Lattice takes a schema of parameters, values, and constraints and generates a minimal covering array: the smallest practical set of scenarios in which every valid pair (or triple, at strength 3) of values appears at least once. Constraints are honored during generation, so no scenario is ever invalid.
 
-This is the Ruby implementation of [Lattice](https://github.com/tylerklose/lattice) ([lattice-cli on PyPI](https://pypi.org/project/lattice-cli/)). Same schema format, same algorithm, same seeds — **byte-identical output** for the same schema, seed, and pool size. That parity is enforced by the test suite, which runs both implementations and diffs their output. Use whichever runtime your project already has.
+This is the Ruby package of [Lattice](https://github.com/tylerklose/lattice) ([lattice-cli on PyPI](https://pypi.org/project/lattice-cli/)). Both packages generate scenarios with the same Rust engine, so they give **byte-identical output** for the same schema, seed and pool size. The test suite checks that by running both and comparing their output. Use whichever runtime your project already has.
 
 ## Install
 
@@ -18,6 +18,8 @@ or standalone:
 ```bash
 gem install latticerb
 ```
+
+The gem ships precompiled for macOS (Apple Silicon and Intel), Linux (x86-64 and ARM64, glibc and musl) and Windows (x86-64). On other platforms it compiles the engine on install, which needs a Rust toolchain. JRuby isn't supported, because it can't load native extensions. If your Gemfile.lock was created on a Mac and you deploy to Linux, add the platform once: `bundle lock --add-platform x86_64-linux`.
 
 ## Library usage
 
@@ -60,7 +62,7 @@ Lattice.scenarios(file: "...")  # shortcut straight to the hashes
 Lattice.validate!(schema)       # raises Lattice::ValidationError / Lattice::ConstraintError
 ```
 
-Generation options: `strength:` (default 2 = pairwise), `seed:` (default 42), `pool_size:`, `max_rows:`, `stop_after_coverage:`.
+Generation options: `strength:` (default 2 = pairwise), `seed:` (default 42), `pool_size:` (candidate rows per step, default 16), `max_rows:`, `stop_after_coverage:`.
 
 ## CLI usage
 
@@ -110,17 +112,45 @@ Every value in a schema (the model name, parameter names and values, and constra
 
 Changed in 0.3.0: earlier versions converted unquoted numbers and dates, so `0x1F` became `31`, `1.10` became `1.1`, and some values (`.inf`, timestamps) came out differently in the Ruby and Python implementations.
 
+## Performance
+
+Generation runs in a Rust engine (the `lattice-engine` crate), in two phases:
+
+1. **Build.** Rows are added greedily. Each row is the best of several candidates (`pool_size:`, default 16), and each candidate picks, value by value, whatever covers the most combinations still uncovered.
+2. **Shrink.** A row is removed and the gaps are repaired with tabu search, which changes values in the remaining rows without breaking any constraint or forced combination. This repeats while repairs succeed within a fixed step budget.
+
+The budget is a number of steps, not a time limit, so the same schema and seed give the same rows on every machine. The rows come out ordered so each adds the most new coverage, which is why `max_rows:` and `stop_after_coverage:` cut the set short with as much coverage as possible.
+
+Scenario counts against [PICT](https://github.com/microsoft/pict) 3.7, with default settings for both:
+
+| Model | PICT | Lattice 0.4 | Lattice 0.3 |
+|---|---|---|---|
+| 13 parameters × 3 values | 20 | **15** (best known) | 22 |
+| 100 × 2 | 16 | **10** (optimal) | over 60 s |
+| 61 mixed (4^15 3^17 2^29) | 40 | **30** | over 60 s |
+| 12 × 6 | 70 | **60** | 88 (32 s) |
+| 30 × 5 | 66 | **55** | over 60 s |
+| 20 × 10 | 218 | **192** | over 60 s |
+| Strength 3, 10 × 4 | 158 | **140** | 176 (27 s) |
+
+Each Lattice 0.4 run above takes 0.04–1.2 s on an Apple M-series laptop. PICT is faster (about 0.02 s) because it stops after the build phase.
+
+Changed in 0.4.0: rows differ from 0.3.x for the same seed, and every example needs the same number of scenarios or fewer. `pool_size:` now sets the candidates per row; its default went from 50 to 16.
+
 ## Parity with the Python implementation
 
-The generator seeds an MT19937 RNG that reproduces CPython's `random.Random` bit-for-bit, so both implementations walk the same candidate pools and pick the same rows. `test/python_parity_test.rb` shells out to the Python implementation (checkout via `LATTICE_PYTHON_SRC`, or an installed `lattice-cli`) and asserts byte-equal output across formats, seeds, strengths, and stopping rules; it skips when no Python implementation is available.
+Both packages parse schemas in their own language and hand the engine the same compiled constraints (`ConstraintEngine#engine_constraints` here, `lattice.ipog` in Python), so the engine gets identical input. `test/python_parity_test.rb` shells out to the Python implementation (checkout via `LATTICE_PYTHON_SRC`, or an installed `lattice-cli`) and asserts byte-equal output across formats, seeds, strengths and stopping rules; it skips when no Python implementation is available.
 
 Schemas are read with Psych here and PyYAML in Python, but both implementations build values from the parsed text with the same rules (see "Values keep their text"), so a schema means the same thing in either. `test/fixtures/scalar_text.*` pins those rules for both.
 
 ## Development
 
+Building the extension needs a Rust toolchain (`rustup`), and, until `lattice-engine` is on crates.io, a checkout of it next to this repo (`../lattice-engine`).
+
 ```bash
 bundle install
-bundle exec rake test        # unit, golden-parity, and live Python-parity suites
+bundle exec rake compile     # builds lib/lattice/lattice_native
+bundle exec rake test        # unit, golden-parity, and live Python-parity suites (compiles first)
 bundle exec mutant run       # mutation testing (see docs/mutation-testing.md)
 ```
 

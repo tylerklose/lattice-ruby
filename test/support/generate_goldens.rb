@@ -24,7 +24,7 @@ PYTHON = ENV.fetch("LATTICE_PYTHON", "python3")
 
 SCHEMA_FILES = { "simple" => "simple.json", "constrained" => "constrained.json", "skillit" => "skillit.json" }.freeze
 SEEDS = { "default" => 42, "alt" => 7 }.freeze
-POOL_SIZES = { "minimal" => 1, "default" => 50 }.freeze
+POOL_SIZES = { "minimal" => 1, "default" => 16 }.freeze
 MAX_ROWS_LIMIT = 3
 STOP_PCT_LIMIT = 75.0
 

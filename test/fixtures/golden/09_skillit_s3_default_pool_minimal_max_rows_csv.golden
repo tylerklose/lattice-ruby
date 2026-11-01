@@ -1,0 +1,4 @@
+trade,location_mode,per_diem,relocation,union,pay_range,skills
+carpenter,statewide,false,false,all,absent,zero
+electrician,local,true,true,all,present,zero
+plumber,nationwide,true,false,union,present,two_plus
