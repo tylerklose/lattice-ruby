@@ -1,13 +1,15 @@
 name: Release gems
 
-# A v* tag tests the gem, then builds the source gem and one precompiled gem per
-# platform (each with a build for every supported Ruby), and pushes them all to
-# RubyGems by trusted publishing once the `rubygems` environment is approved.
+# Tests the gem, then builds the source gem and one precompiled gem per platform
+# (each with a build for every supported Ruby). Pull requests stop there; a v*
+# tag also pushes them all to RubyGems by trusted publishing, once the
+# `rubygems` environment is approved.
 
 on:
   push:
     tags:
       - 'v*'
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -96,6 +98,7 @@ jobs:
   publish:
     name: Publish to RubyGems
     needs: collect
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: rubygems
