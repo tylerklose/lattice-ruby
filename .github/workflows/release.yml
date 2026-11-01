@@ -1,8 +1,8 @@
 name: Release gems
 
 # A v* tag tests the gem, then builds the source gem and one precompiled gem per
-# platform (each with a build for every supported Ruby). The gems are uploaded
-# as one artifact; publishing them to RubyGems is a separate, approved step.
+# platform (each with a build for every supported Ruby), and pushes them all to
+# RubyGems by trusted publishing once the `rubygems` environment is approved.
 
 on:
   push:
@@ -92,3 +92,31 @@ jobs:
         with:
           name: latticerb-gems
           path: gems
+
+  publish:
+    name: Publish to RubyGems
+    needs: collect
+    runs-on: ubuntu-latest
+    environment:
+      name: rubygems
+      url: https://rubygems.org/gems/latticerb
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: latticerb-gems
+          path: gems
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      # Trusted publishing: RubyGems exchanges this workflow's OIDC token for a
+      # short-lived push key, so no API key or OTP is stored anywhere.
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+      - name: Push every gem (platform gems first, then the source gem)
+        shell: bash
+        run: |
+          source_gem='^gems/latticerb-[0-9.]+\.gem$'
+          for gem in gems/*.gem; do [[ $gem =~ $source_gem ]] || gem push "$gem"; done
+          for gem in gems/*.gem; do [[ $gem =~ $source_gem ]] && gem push "$gem"; done
