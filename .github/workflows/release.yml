@@ -1,0 +1,125 @@
+name: Release gems
+
+# Tests the gem, then builds the source gem and one precompiled gem per platform
+# (each with a build for every supported Ruby). Pull requests stop there; a v*
+# tag also pushes them all to RubyGems by trusted publishing, once the
+# `rubygems` environment is approved.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Ruby ${{ matrix.ruby }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        ruby: ['3.2', '3.4', '4.0']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - name: Compile and test
+        run: bundle exec rake test
+
+  native:
+    name: Native gem (${{ matrix.platform }})
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - x86_64-linux
+          - aarch64-linux
+          - x86_64-linux-musl
+          - aarch64-linux-musl
+          - x86_64-darwin
+          - arm64-darwin
+          - x64-mingw-ucrt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      - uses: oxidize-rb/actions/cross-gem@v1
+        id: cross-gem
+        with:
+          platform: ${{ matrix.platform }}
+          ruby-versions: '3.2,3.3,3.4,4.0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gem-${{ matrix.platform }}
+          path: ${{ steps.cross-gem.outputs.gem-path }}
+
+  source:
+    name: Source gem
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      - run: gem build latticerb.gemspec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gem-source
+          path: latticerb-*.gem
+
+  collect:
+    name: All gems
+    needs: [native, source]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: gems
+          pattern: gem-*
+          merge-multiple: true
+      - run: ls -l gems
+      - uses: actions/upload-artifact@v4
+        with:
+          name: latticerb-gems
+          path: gems
+
+  publish:
+    name: Publish to RubyGems
+    needs: collect
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: rubygems
+      url: https://rubygems.org/gems/latticerb
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: latticerb-gems
+          path: gems
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+      # Trusted publishing: RubyGems exchanges this workflow's OIDC token for a
+      # short-lived push key, so no API key or OTP is stored anywhere.
+      - uses: rubygems/configure-rubygems-credentials@v1.0.0
+      - name: Push every gem (platform gems first, then the source gem)
+        shell: bash
+        run: |
+          source_gem='^gems/latticerb-[0-9.]+\.gem$'
+          for gem in gems/*.gem; do [[ $gem =~ $source_gem ]] || gem push "$gem"; done
+          for gem in gems/*.gem; do [[ $gem =~ $source_gem ]] && gem push "$gem"; done

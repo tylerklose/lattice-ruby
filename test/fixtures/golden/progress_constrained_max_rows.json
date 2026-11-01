@@ -1,13 +1,5 @@
 [
   {
-    "event": "enumerating",
-    "scenario": 0,
-    "covered": 109,
-    "total": 109,
-    "cumulative_pct": 100.0,
-    "uncovered": 0
-  },
-  {
     "event": "enumerated",
     "scenario": 0,
     "covered": 0,

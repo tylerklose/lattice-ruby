@@ -70,42 +70,47 @@ class ConstraintsEdgeTest < Minitest::Test
     assert_equal [[[0, 2], [4, 1], [3, 0]]], engine.forced_interactions
   end
 
-  def test_complete_assignment_valid_accepts_a_valid_row
+  def test_can_complete_accepts_a_valid_full_row
     # apple_pay, US, USD, macos, safari, none, N/A
-    assert engine.complete_assignment_valid?([2, 0, 0, 0, 1, 0, 2])
+    assert engine.can_complete?({ 0 => 2, 1 => 0, 2 => 0, 3 => 0, 4 => 1, 5 => 0, 6 => 2 })
   end
 
-  def test_complete_assignment_valid_rejects_higher_order_violation
+  def test_can_complete_rejects_a_higher_order_violation
     # apple_pay + UK + USD violates the higher_order constraint; all pairs valid.
-    refute engine.complete_assignment_valid?([2, 1, 0, 0, 1, 0, 2])
+    refute engine.can_complete?({ 0 => 2, 1 => 1, 2 => 0, 3 => 0, 4 => 1, 5 => 0, 6 => 2 })
   end
 
-  def test_complete_assignment_valid_rejects_invalid_pair
+  def test_can_complete_rejects_an_invalid_pair
     # apple_pay + windows violates the invalid_pair.
-    refute engine.complete_assignment_valid?([2, 0, 0, 1, 0, 0, 2])
+    refute engine.can_complete?({ 0 => 2, 1 => 0, 2 => 0, 3 => 1, 4 => 0, 5 => 0, 6 => 2 })
   end
 
-  def test_complete_assignment_valid_rejects_partial_rows
-    refute engine.complete_assignment_valid?([2, 0, 0])
+  def test_can_complete_accepts_a_completable_partial_row
+    assert engine.can_complete?({ 0 => 2, 1 => 0, 2 => 0 })
   end
 
   def test_can_complete_rejects_conflicting_partial
     refute engine.can_complete?({ 0 => 2, 3 => 1 })
   end
 
-  def test_can_complete_answers_are_cached
+  def test_can_complete_follows_implied_requirements
+    # loyalty=gold requires payment_method=credit_card.
+    assert engine.can_complete?({ 5 => 1, 0 => 0 })
+    refute engine.can_complete?({ 5 => 1, 0 => 1 })
+  end
+
+  def test_can_complete_answers_are_stable
     partial = { 0 => 2, 3 => 1 }
     assert_equal engine.can_complete?(partial), engine.can_complete?(partial)
   end
 
-  def test_complete_assignment_fills_implied_requirements
-    row = engine.complete_assignment({ 5 => 1 }) # loyalty=gold
-    assert_equal 0, row[0] # requires payment_method=credit_card
-    assert engine.complete_assignment_valid?(row)
+  def test_satisfiable_model
+    assert_predicate engine, :satisfiable?
   end
 
-  def test_complete_assignment_returns_nil_for_infeasible_partial
-    assert_nil engine.complete_assignment({ 0 => 2, 3 => 1 })
+  def test_engine_rejects_out_of_range_assignments
+    error = assert_raises(ArgumentError) { engine.can_complete?({ 9 => 0 }) }
+    assert_match(/out of range/, error.message)
   end
 
   def test_assignments_compare_by_parameter_then_value

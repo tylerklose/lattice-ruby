@@ -8,3 +8,4 @@ gem "minitest", "~> 5.25"
 gem "mutant", require: false
 gem "mutant-minitest", require: false
 gem "rake", "~> 13.0"
+gem "rake-compiler", "~> 1.3"

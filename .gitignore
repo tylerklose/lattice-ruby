@@ -3,3 +3,9 @@
 /Gemfile.lock
 /pkg/
 /tmp/
+lib/lattice/*.bundle
+lib/lattice/*.so
+tmp/
+ext/lattice_native/target/
+target/
+.mutant/

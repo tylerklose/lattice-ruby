@@ -180,7 +180,7 @@ module Lattice
 
       reduction = exhaustive_count.to_f / scenario_count
       if (reduction - reduction.round).abs < 1e-9
-        "#{reduction.round(half: :even)}x"
+        "#{reduction.round}x"
       else
         format("%.1fx", reduction)
       end

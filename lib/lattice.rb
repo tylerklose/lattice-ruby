@@ -57,7 +57,7 @@ module Lattice
     #
     #   run = Lattice.generate(file: "spec/fixtures/checkout.yaml")
     #   run.scenarios.each { |row| ... }
-    def generate(source = nil, file: nil, strength: nil, seed: 42, pool_size: 50,
+    def generate(source = nil, file: nil, strength: nil, seed: 42, pool_size: 16,
                  max_rows: nil, stop_after_coverage: nil, progress: nil)
       model = parse_model(source, file:, strength:)
       result = IPOG.generate_covering_array(
@@ -80,7 +80,7 @@ module Lattice
     def validate!(source = nil, file: nil, strength: nil)
       model = parse_model(source, file:, strength:)
       engine = ConstraintEngine.new(model)
-      raise ValidationError, ["Model has no valid complete assignments."] unless engine.can_complete?({})
+      raise ValidationError, ["Model has no valid complete assignments."] unless engine.satisfiable?
 
       model
     end

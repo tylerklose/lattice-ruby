@@ -1,13 +1,5 @@
 [
   {
-    "event": "enumerating",
-    "scenario": 0,
-    "covered": 677,
-    "total": 677,
-    "cumulative_pct": 100.0,
-    "uncovered": 0
-  },
-  {
     "event": "enumerated",
     "scenario": 0,
     "covered": 0,
@@ -26,174 +18,118 @@
   {
     "event": "scenario",
     "scenario": 2,
-    "covered": 69,
+    "covered": 70,
     "total": 663,
-    "cumulative_pct": 10.4,
-    "uncovered": 594
+    "cumulative_pct": 10.6,
+    "uncovered": 593
   },
   {
     "event": "scenario",
     "scenario": 3,
-    "covered": 99,
+    "covered": 105,
     "total": 663,
-    "cumulative_pct": 14.9,
-    "uncovered": 564
+    "cumulative_pct": 15.8,
+    "uncovered": 558
   },
   {
     "event": "scenario",
     "scenario": 4,
-    "covered": 126,
+    "covered": 140,
     "total": 663,
-    "cumulative_pct": 19.0,
-    "uncovered": 537
+    "cumulative_pct": 21.1,
+    "uncovered": 523
   },
   {
     "event": "scenario",
     "scenario": 5,
-    "covered": 150,
+    "covered": 174,
     "total": 663,
-    "cumulative_pct": 22.6,
-    "uncovered": 513
+    "cumulative_pct": 26.2,
+    "uncovered": 489
   },
   {
     "event": "scenario",
     "scenario": 6,
-    "covered": 180,
+    "covered": 208,
     "total": 663,
-    "cumulative_pct": 27.1,
-    "uncovered": 483
+    "cumulative_pct": 31.4,
+    "uncovered": 455
   },
   {
     "event": "scenario",
     "scenario": 7,
-    "covered": 202,
+    "covered": 239,
     "total": 663,
-    "cumulative_pct": 30.5,
-    "uncovered": 461
+    "cumulative_pct": 36.0,
+    "uncovered": 424
   },
   {
     "event": "scenario",
     "scenario": 8,
-    "covered": 223,
+    "covered": 269,
     "total": 663,
-    "cumulative_pct": 33.6,
-    "uncovered": 440
+    "cumulative_pct": 40.6,
+    "uncovered": 394
   },
   {
     "event": "scenario",
     "scenario": 9,
-    "covered": 246,
+    "covered": 299,
     "total": 663,
-    "cumulative_pct": 37.1,
-    "uncovered": 417
+    "cumulative_pct": 45.1,
+    "uncovered": 364
   },
   {
     "event": "scenario",
     "scenario": 10,
-    "covered": 267,
+    "covered": 325,
     "total": 663,
-    "cumulative_pct": 40.3,
-    "uncovered": 396
+    "cumulative_pct": 49.0,
+    "uncovered": 338
   },
   {
     "event": "scenario",
     "scenario": 11,
-    "covered": 285,
+    "covered": 348,
     "total": 663,
-    "cumulative_pct": 43.0,
-    "uncovered": 378
+    "cumulative_pct": 52.5,
+    "uncovered": 315
   },
   {
     "event": "scenario",
     "scenario": 12,
-    "covered": 306,
+    "covered": 371,
     "total": 663,
-    "cumulative_pct": 46.2,
-    "uncovered": 357
+    "cumulative_pct": 56.0,
+    "uncovered": 292
   },
   {
     "event": "scenario",
     "scenario": 13,
-    "covered": 331,
+    "covered": 393,
     "total": 663,
-    "cumulative_pct": 49.9,
-    "uncovered": 332
+    "cumulative_pct": 59.3,
+    "uncovered": 270
   },
   {
     "event": "scenario",
     "scenario": 14,
-    "covered": 347,
+    "covered": 414,
     "total": 663,
-    "cumulative_pct": 52.3,
-    "uncovered": 316
+    "cumulative_pct": 62.4,
+    "uncovered": 249
   },
   {
     "event": "scenario",
     "scenario": 15,
-    "covered": 363,
+    "covered": 433,
     "total": 663,
-    "cumulative_pct": 54.8,
-    "uncovered": 300
+    "cumulative_pct": 65.3,
+    "uncovered": 230
   },
   {
     "event": "scenario",
     "scenario": 16,
-    "covered": 383,
-    "total": 663,
-    "cumulative_pct": 57.8,
-    "uncovered": 280
-  },
-  {
-    "event": "scenario",
-    "scenario": 17,
-    "covered": 400,
-    "total": 663,
-    "cumulative_pct": 60.3,
-    "uncovered": 263
-  },
-  {
-    "event": "scenario",
-    "scenario": 18,
-    "covered": 410,
-    "total": 663,
-    "cumulative_pct": 61.8,
-    "uncovered": 253
-  },
-  {
-    "event": "scenario",
-    "scenario": 19,
-    "covered": 423,
-    "total": 663,
-    "cumulative_pct": 63.8,
-    "uncovered": 240
-  },
-  {
-    "event": "scenario",
-    "scenario": 20,
-    "covered": 431,
-    "total": 663,
-    "cumulative_pct": 65.0,
-    "uncovered": 232
-  },
-  {
-    "event": "scenario",
-    "scenario": 21,
-    "covered": 440,
-    "total": 663,
-    "cumulative_pct": 66.4,
-    "uncovered": 223
-  },
-  {
-    "event": "scenario",
-    "scenario": 22,
-    "covered": 445,
-    "total": 663,
-    "cumulative_pct": 67.1,
-    "uncovered": 218
-  },
-  {
-    "event": "scenario",
-    "scenario": 23,
     "covered": 451,
     "total": 663,
     "cumulative_pct": 68.0,
@@ -201,42 +137,34 @@
   },
   {
     "event": "scenario",
-    "scenario": 24,
-    "covered": 455,
+    "scenario": 17,
+    "covered": 467,
     "total": 663,
-    "cumulative_pct": 68.6,
-    "uncovered": 208
+    "cumulative_pct": 70.4,
+    "uncovered": 196
   },
   {
     "event": "scenario",
-    "scenario": 25,
-    "covered": 472,
+    "scenario": 18,
+    "covered": 483,
     "total": 663,
-    "cumulative_pct": 71.2,
-    "uncovered": 191
+    "cumulative_pct": 72.9,
+    "uncovered": 180
   },
   {
     "event": "scenario",
-    "scenario": 26,
-    "covered": 489,
+    "scenario": 19,
+    "covered": 497,
     "total": 663,
-    "cumulative_pct": 73.8,
-    "uncovered": 174
-  },
-  {
-    "event": "scenario",
-    "scenario": 27,
-    "covered": 500,
-    "total": 663,
-    "cumulative_pct": 75.4,
-    "uncovered": 163
+    "cumulative_pct": 75.0,
+    "uncovered": 166
   },
   {
     "event": "stopped",
-    "scenario": 27,
-    "covered": 500,
+    "scenario": 19,
+    "covered": 497,
     "total": 663,
-    "cumulative_pct": 75.4,
-    "uncovered": 163
+    "cumulative_pct": 75.0,
+    "uncovered": 166
   }
 ]
