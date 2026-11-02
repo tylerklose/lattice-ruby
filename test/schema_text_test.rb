@@ -172,4 +172,33 @@ class SchemaTextTest < Minitest::Test
       assert_equal ["`strength` must be an integer."], strength_result(strength), strength.inspect
     end
   end
+
+  # Issue #5: aliases count once per place they expand to, capped at 100,000
+  # values. Tests/test_schema_text.py in lattice-cli pins the same boundaries.
+  def test_yaml_value_limit_counts_every_value
+    flat = ->(n) { "[#{Array.new(n, 'x').join(', ')}]" }
+
+    assert_equal 99_999, Lattice::SchemaText.load_yaml(flat.(99_999)).length
+    error = assert_raises(Lattice::SchemaText::TooLarge) { Lattice::SchemaText.load_yaml(flat.(100_000)) }
+    assert_equal "schema expands to more than 100000 values (check YAML aliases)", error.message
+  end
+
+  def test_yaml_value_limit_counts_aliases_by_what_they_expand_to
+    # 1 (outer list) + 11 (anchored list of ten) + 11 per alias.
+    aliased = ->(n) { "[&a [#{Array.new(10, 'x').join(', ')}], #{Array.new(n, '*a').join(', ')}]" }
+
+    assert_equal 9090, Lattice::SchemaText.load_yaml(aliased.(9089)).length
+    assert_raises(Lattice::SchemaText::TooLarge) { Lattice::SchemaText.load_yaml(aliased.(9090)) }
+  end
+
+  def test_yaml_alias_bomb_fails_fast_with_a_clear_error
+    bomb = File.expand_path("fixtures/yaml_alias_bomb.yaml", __dir__)
+    error = assert_raises(Lattice::ModelIOError) { Lattice::Parser.load_model(bomb) }
+    assert_equal "Unable to parse model from `#{bomb}`: schema expands to more than 100000 values (check YAML aliases)",
+                 error.message
+    # Read without an extension, the JSON parser's complaint is left out.
+    error = assert_raises(Lattice::ModelIOError) { Lattice::Parser.deserialize_model(File.read(bomb), "stdin", nil) }
+    assert_equal "Unable to parse model from `stdin`: schema expands to more than 100000 values (check YAML aliases)",
+                 error.message
+  end
 end

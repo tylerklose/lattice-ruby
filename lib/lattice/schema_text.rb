@@ -21,6 +21,18 @@ module Lattice
 
     class SyntaxError < StandardError; end
 
+    # Raised when YAML aliases would expand the schema past MAX_VALUES values
+    # (the "billion laughs" pattern). Every value counts once per place it
+    # appears after expansion, so the limit holds however the aliases nest.
+    class TooLarge < StandardError; end
+
+    MAX_VALUES = 100_000
+    TOO_LARGE = "schema expands to more than #{MAX_VALUES} values (check YAML aliases)".freeze
+
+    # Anchors seen so far, as anchor => [value, size] once built (nil while
+    # still being built), and the running count of expanded values.
+    Expansion = Struct.new(:anchors, :count)
+
     TRUE_WORDS = %w[yes Yes YES true True TRUE on On ON].freeze
     FALSE_WORDS = %w[no No NO false False FALSE off Off OFF].freeze
     NULL_WORDS = ["", "~", "null", "Null", "NULL"].freeze
@@ -57,7 +69,7 @@ module Lattice
       raise SyntaxError, "expected a single YAML document, found #{documents.length}" if documents.length > 1
       return nil if documents.empty?
 
-      yaml_value(documents.first.root, {})
+      yaml_value(documents.first.root, Expansion.new({}, 0))
     end
 
     private
@@ -71,29 +83,37 @@ module Lattice
       end
     end
 
-    # `anchors` maps each anchor to its value once built; an anchor still
-    # being built (nil value) means an alias points back into itself.
-    def yaml_value(node, anchors)
-      return yaml_alias(node, anchors) if node.is_a?(Psych::Nodes::Alias)
+    # An anchor still being built (nil in `anchors`) means an alias points
+    # back into itself.
+    def yaml_value(node, expansion)
+      return yaml_alias(node, expansion) if node.is_a?(Psych::Nodes::Alias)
 
-      anchors[node.anchor] = nil if node.anchor
+      start = expansion.count
+      add_values(expansion, 1)
+      expansion.anchors[node.anchor] = nil if node.anchor
       value =
         case node
         when Psych::Nodes::Scalar then yaml_scalar(node)
         when Psych::Nodes::Sequence
           check_tag(node.tag, SEQUENCE_TAGS)
-          node.children.map { |child| yaml_value(child, anchors) }
-        when Psych::Nodes::Mapping then yaml_mapping(node, anchors)
+          node.children.map { |child| yaml_value(child, expansion) }
+        when Psych::Nodes::Mapping then yaml_mapping(node, expansion)
         end
-      anchors[node.anchor] = [value] if node.anchor
+      expansion.anchors[node.anchor] = [value, expansion.count - start] if node.anchor
       value
     end
 
-    def yaml_alias(node, anchors)
-      built = anchors.fetch(node.anchor) { raise SyntaxError, "unknown alias `*#{node.anchor}`" }
+    def yaml_alias(node, expansion)
+      built = expansion.anchors.fetch(node.anchor) { raise SyntaxError, "unknown alias `*#{node.anchor}`" }
       raise SyntaxError, "recursive alias" if built.nil?
 
+      add_values(expansion, built.last)
       built.first
+    end
+
+    def add_values(expansion, values)
+      expansion.count += values
+      raise TooLarge, TOO_LARGE if expansion.count > MAX_VALUES
     end
 
     def yaml_scalar(node)
@@ -108,20 +128,20 @@ module Lattice
 
     # Keys from `<<` merges come first, earlier sources winning; the
     # mapping's own keys then override them. A key written twice is an error.
-    def yaml_mapping(node, anchors)
+    def yaml_mapping(node, expansion)
       check_tag(node.tag, MAPPING_TAGS)
       merged = {}
       own = {}
       seen_merge = false
       node.children.each_slice(2) do |key_node, value_node|
-        key = yaml_value(key_node, anchors)
+        key = yaml_value(key_node, expansion)
         raise SyntaxError, "mapping keys must be scalars" if key.is_a?(Enumerable)
 
         if merge_key?(key_node)
           raise SyntaxError, "duplicate key `<<`" if seen_merge
 
           seen_merge = true
-          merge_sources(yaml_value(value_node, anchors)).each do |source|
+          merge_sources(yaml_value(value_node, expansion)).each do |source|
             source.each { |merged_key, merged_value| merged[merged_key] = merged_value unless merged.key?(merged_key) }
           end
           next
@@ -129,7 +149,7 @@ module Lattice
 
         raise SyntaxError, "duplicate key `#{Lattice.normalize_scalar(key)}`" if own.key?(key)
 
-        own[key] = yaml_value(value_node, anchors)
+        own[key] = yaml_value(value_node, expansion)
       end
       merged.merge(own)
     end

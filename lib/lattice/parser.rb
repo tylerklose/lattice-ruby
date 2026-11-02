@@ -88,6 +88,9 @@ module Lattice
       errors = []
       loaders.each do |loader|
         return loader == :json ? SchemaText.load_json(text) : SchemaText.load_yaml(text)
+      rescue SchemaText::TooLarge => e
+        # Not a syntax error, so the other loader's complaint would only mislead.
+        raise ModelIOError, "Unable to parse model from `#{source_name}`: #{e.message}"
       rescue StandardError => e
         errors << e.message
       end
