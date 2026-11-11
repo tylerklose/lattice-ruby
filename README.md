@@ -6,6 +6,8 @@ Lattice takes a schema of parameters, values, and constraints and generates a mi
 
 This is the Ruby package of [Lattice](https://github.com/tylerklose/lattice) ([lattice-cli on PyPI](https://pypi.org/project/lattice-cli/)). Both packages generate scenarios with the same Rust engine, so they give **byte-identical output** for the same schema, seed and pool size. The test suite checks that by running both and comparing their output. Use whichever runtime your project already has.
 
+To try it without installing, use the playground at [lattice.nolook.ai](https://lattice.nolook.ai), or the hosted MCP server at `https://lattice.nolook.ai/mcp`.
+
 ## Install
 
 ```ruby
